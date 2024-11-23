@@ -1,0 +1,25 @@
+@import '@fontsource/playfair-display/400.css';
+@import '@fontsource/playfair-display/600.css';
+@import '@fontsource/playfair-display/700.css';
+@import '@fontsource/poppins/400.css';
+@import '@fontsource/poppins/500.css';
+@import '@fontsource/poppins/600.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-navy-dark text-white font-sans;
+    background: radial-gradient(circle at 50% 50%, theme('colors.navy.light') 0%, theme('colors.navy.DEFAULT') 50%, theme('colors.navy.dark') 100%);
+  }
+  
+  #root {
+    min-height: 100vh;
+    background: 
+      radial-gradient(circle at 0% 0%, theme('colors.accent.DEFAULT/20') 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, theme('colors.secondary.DEFAULT/20') 0%, transparent 50%),
+      radial-gradient(circle at 50% 100%, theme('colors.accent.DEFAULT/20') 0%, transparent 50%);
+  }
+}

@@ -1,0 +1,22 @@
+# Node.js dependencies
+node_modules
+
+# Build output
+dist
+
+# Environment variables
+.env
+
+# MacOS specific files
+.DS_Store
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vite cache
+.vite
+
+# TypeScript cache
+*.tsbuildinfo
