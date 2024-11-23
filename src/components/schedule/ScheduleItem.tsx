@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  UserGroupIcon,
   AcademicCapIcon,
   BeakerIcon,
   ClockIcon,
@@ -50,9 +49,9 @@ const typeColors = {
 };
 
 const formatTime = (date: Date): string => {
-  return date.toLocaleTimeString('hu-HU', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  return date.toLocaleTimeString('hu-HU', {
+    hour: '2-digit',
+    minute: '2-digit'
   });
 };
 
@@ -61,7 +60,7 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ item, startTime, onRemove, 
   const [editedTitle, setEditedTitle] = useState(item.title);
   const [editedDuration, setEditedDuration] = useState(item.duration);
   const inputRef = useRef<HTMLInputElement>(null);
-  
+
   const Icon = typeIcons[item.type] || AcademicCapIcon;
   const colorClasses = typeColors[item.type] || typeColors.session;
 

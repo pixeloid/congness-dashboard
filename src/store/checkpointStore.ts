@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { 
-  Checkpoint, 
-  CheckpointVisit, 
+import {
+  Checkpoint,
+  CheckpointVisit,
   ParticipantPassport,
   CheckpointStats,
-  CheckpointFilters 
+  CheckpointFilters
 } from '@/types/checkpoints';
 
 interface CheckpointState {
@@ -163,7 +163,7 @@ export const useCheckpointStore = create<CheckpointState>()(
             visit.validated = true;
 
             // Update passport validation
-            const passport = state.passports.find(p => 
+            const passport = state.passports.find(p =>
               p.checkpoints.some(c => c.visitId === visitId)
             );
             if (passport) {
@@ -200,7 +200,7 @@ export const useCheckpointStore = create<CheckpointState>()(
         const visits = state.visits.filter(v => v.checkpointId === checkpointId);
         const uniqueVisitors = new Set(visits.map(v => v.participantId)).size;
         const validatedVisits = visits.filter(v => v.validated).length;
-        const lastVisit = visits.length > 0 
+        const lastVisit = visits.length > 0
           ? visits.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0].timestamp
           : undefined;
 
@@ -224,7 +224,7 @@ export const useCheckpointStore = create<CheckpointState>()(
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          set((state) => ({
+          set((_state) => ({
             checkpoints: initialCheckpoints.filter(c => c.occasionId === occasionId),
             isLoading: false
           }));
@@ -237,7 +237,7 @@ export const useCheckpointStore = create<CheckpointState>()(
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          set((state) => ({
+          set((_state) => ({
             passports: initialPassports.filter(
               p => p.participantId === participantId && p.occasionId === occasionId
             ),

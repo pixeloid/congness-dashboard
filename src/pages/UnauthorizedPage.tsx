@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import Logo from '@/components/common/Logo';
@@ -9,7 +8,7 @@ const UnauthorizedPage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4">
       <Logo className="h-12 w-auto mb-8" />
-      
+
       <div className="text-center space-y-4">
         <ExclamationTriangleIcon className="h-16 w-16 text-red-500 mx-auto" />
         <h1 className="text-3xl font-display font-bold text-white">

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { AuthState, User, UserRole } from '@/types/auth';
+import { AuthState, User } from '@/types/auth';
 
 interface AuthStore extends AuthState {
   actions: {
@@ -49,12 +49,12 @@ export const useAuthStore = create<AuthStore>()(
     isLoading: false,
     error: null,
     actions: {
-      login: async (email: string, password: string) => {
+      login: async (email: string, _password: string) => {
         set({ isLoading: true, error: null });
         try {
           // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 1000));
-          
+
           const user = mockUsers.find(u => u.email === email);
           if (!user) {
             throw new Error('Invalid credentials');
@@ -94,7 +94,7 @@ export const useAuthStore = create<AuthStore>()(
         try {
           // Simulate API call to check session
           await new Promise(resolve => setTimeout(resolve, 500));
-          
+
           // For development, auto-login as event manager
           set({
             user: mockUsers[0],

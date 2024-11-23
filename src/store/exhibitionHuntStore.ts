@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { 
-  ExhibitionHunt, 
+import {
+  ExhibitionHunt,
   ExhibitionHuntVisit,
   ExhibitionHuntParticipant,
   HuntFilters
@@ -94,7 +94,7 @@ export const useExhibitionHuntStore = create<ExhibitionHuntState>()(
           state.hunts = state.hunts.filter(h => h.id !== id);
           state.huntParticipants = state.huntParticipants.filter(hp => hp.huntId !== id);
           state.huntVisits = state.huntVisits.filter(
-            v => !state.huntParticipants.find(hp => hp.huntId === id)
+            _v => !state.huntParticipants.find(hp => hp.huntId === id)
           );
         });
       },
@@ -177,7 +177,7 @@ export const useExhibitionHuntStore = create<ExhibitionHuntState>()(
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          set((state) => ({
+          set((_state) => ({
             hunts: initialHunts.filter(h => h.occasionId === occasionId),
             isLoading: false
           }));
@@ -190,7 +190,7 @@ export const useExhibitionHuntStore = create<ExhibitionHuntState>()(
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          set((state) => ({
+          set((_state) => ({
             huntParticipants: initialHuntParticipants.filter(hp => hp.participantId === participantId),
             isLoading: false
           }));
@@ -199,11 +199,11 @@ export const useExhibitionHuntStore = create<ExhibitionHuntState>()(
         }
       },
 
-      fetchHuntProgress: async (huntId, participantId) => {
+      fetchHuntProgress: async (_huntId, participantId) => {
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          set((state) => ({
+          set(() => ({
             huntVisits: initialVisits.filter(
               v => v.participantId === participantId
             ),

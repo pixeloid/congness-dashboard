@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
@@ -9,15 +8,16 @@ import ParticipantFilters from '@/components/participants/ParticipantFilters';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { UserPlusIcon } from '@heroicons/react/24/outline';
+import { useEffect } from 'react';
 
 const ParticipantsPage = () => {
   const { occasionId } = useParams<{ occasionId: string }>();
-  const { 
-    participants, 
+  const {
+    participants,
     filters,
     isLoading,
     error,
-    actions: { 
+    actions: {
       fetchParticipants,
       setFilters,
       deleteParticipant
@@ -99,7 +99,7 @@ const ParticipantsPage = () => {
                     <button className="px-3 py-1 text-sm bg-accent/10 text-accent rounded hover:bg-accent/20 transition-colors">
                       Szerkesztés
                     </button>
-                    <button 
+                    <button
                       onClick={() => deleteParticipant(participant.id)}
                       className="px-3 py-1 text-sm bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors"
                     >

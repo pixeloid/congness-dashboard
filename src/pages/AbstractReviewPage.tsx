@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAbstractStore } from '@/store/abstractStore';
 import ReviewForm from '@/components/abstracts/ReviewForm';
@@ -9,7 +8,7 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 const AbstractReviewPage = () => {
   const { abstractId } = useParams<{ abstractId: string }>();
   const navigate = useNavigate();
-  
+
   const { abstracts, isLoading, error, actions } = useAbstractStore();
   const abstract = abstracts.find(a => a.id === Number(abstractId));
 

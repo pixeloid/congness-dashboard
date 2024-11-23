@@ -64,7 +64,7 @@ export const useScheduleState = () => {
     const newDate = addDays(lastDay.date, 1);
     const newStartTime = new Date(newDate);
     newStartTime.setHours(9, 0, 0, 0);
-    
+
     const newDay = {
       id: `day-${days.length + 1}`,
       date: newDate,
@@ -115,7 +115,9 @@ export const useScheduleState = () => {
                 title: 'New Section',
                 description: 'Section description',
                 chairs: 'Section chairs',
-                items: []
+                items: [],
+                type: 'optional',
+                duration: 0
               }
             ]
           };

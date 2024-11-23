@@ -2,9 +2,8 @@ import React from 'react';
 import { Checkpoint } from '@/types/checkpoints';
 import { useCheckpointStore } from '@/store/checkpointStore';
 import { format } from 'date-fns';
-import { hu } from 'date-fns/locale';
-import { 
-  PencilIcon, 
+import {
+  PencilIcon,
   TrashIcon,
   UserGroupIcon,
   ClockIcon,
@@ -56,7 +55,7 @@ const CheckpointList: React.FC<CheckpointListProps> = ({
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {checkpoints.map((checkpoint) => {
         const stats = getCheckpointStats(checkpoint.id);
-        
+
         return (
           <div key={checkpoint.id} className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10">
             <div className="p-6">
@@ -103,7 +102,7 @@ const CheckpointList: React.FC<CheckpointListProps> = ({
                   <div className="flex items-center gap-2 text-white/70">
                     <ClockIcon className="h-5 w-5 text-accent" />
                     <span>
-                      {format(new Date(checkpoint.startTime), 'HH:mm')} - 
+                      {format(new Date(checkpoint.startTime), 'HH:mm')} -
                       {format(new Date(checkpoint.endTime), 'HH:mm')}
                     </span>
                   </div>

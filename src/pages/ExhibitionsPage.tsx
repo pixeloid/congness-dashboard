@@ -1,4 +1,3 @@
-import React from 'react';
 import { useExhibitionsStore } from '@/store/exhibitionsStore';
 import ExhibitionCard from '@/components/exhibitions/ExhibitionCard';
 import ExhibitionFilters from '@/components/exhibitions/ExhibitionFilters';
@@ -7,10 +6,10 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import { PlusIcon } from '@heroicons/react/24/outline';
 
 const ExhibitionsPage = () => {
-  const { 
-    exhibitions, 
+  const {
+    exhibitions,
     filters,
-    isLoading, 
+    isLoading,
     error,
     actions: {
       setFilters,
@@ -28,7 +27,7 @@ const ExhibitionsPage = () => {
           <h1 className="text-4xl font-display font-bold text-white mb-2">Kiállítások</h1>
           <p className="text-lg text-white/70">Kiállítások és standok kezelése</p>
         </div>
-        <button 
+        <button
           onClick={() => addExhibition()}
           className="inline-flex items-center px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
         >

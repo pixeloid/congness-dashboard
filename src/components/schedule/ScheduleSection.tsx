@@ -4,34 +4,28 @@ import { useDndContext } from '@dnd-kit/core';
 import clsx from 'clsx';
 import DraggableScheduleItem from './DraggableScheduleItem';
 
-interface SectionItem {
-  id: string;
-  duration: number;
-}
+// Assuming Section is a type, you need to import it from the correct module
+import { ScheduleItem, Section } from '@/types/schedule'; // Adjust the import path as necessary
+
 
 interface SectionProps {
-  section: {
-    id: string;
-    title: string;
-    description?: string;
-    items: SectionItem[];
-  };
+  section: Section | ScheduleItem;
   startTime: Date;
 }
 
 const formatTime = (date: Date): string => {
-  return date.toLocaleTimeString('hu-HU', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  return date.toLocaleTimeString('hu-HU', {
+    hour: '2-digit',
+    minute: '2-digit'
   });
 };
 
-const Section: React.FC<SectionProps> = ({ section, startTime }) => {
+const ScheduleSection: React.FC<SectionProps> = ({ section, startTime }) => {
   const { active } = useDndContext();
   let currentTime = new Date(startTime);
-  const endTime = new Date(currentTime.getTime() + 
-    section.items.reduce((total, item) => total + item.duration, 0) * 60000);
-  
+  const endTime = new Date(currentTime.getTime() +
+    (section.items ? section.items.reduce((total, item) => total + item.duration, 0) : 0) * 60000);
+
   const { setNodeRef, isOver } = useDroppable({
     id: `section-${section.id}`,
     data: {
@@ -43,7 +37,7 @@ const Section: React.FC<SectionProps> = ({ section, startTime }) => {
   const isDragging = Boolean(active);
 
   return (
-    <div 
+    <div
       ref={setNodeRef}
       className={clsx(
         'rounded-xl overflow-hidden border transition-all duration-200',
@@ -84,7 +78,7 @@ const Section: React.FC<SectionProps> = ({ section, startTime }) => {
           'bg-navy/40': isDragging && !isOver
         }
       )}>
-        {section.items.map((item) => {
+        {section.items && section.items.map((item) => {
           const itemStartTime = new Date(currentTime);
           currentTime = new Date(currentTime.getTime() + item.duration * 60000);
           return (
@@ -97,7 +91,7 @@ const Section: React.FC<SectionProps> = ({ section, startTime }) => {
           );
         })}
 
-        {section.items.length === 0 && isOver && (
+        {section.items && section.items.length === 0 && isOver && (
           <div className={clsx(
             'text-center py-8 transition-colors duration-200 rounded-lg border-2 border-dashed',
             'text-accent border-accent bg-accent/5'
@@ -106,7 +100,7 @@ const Section: React.FC<SectionProps> = ({ section, startTime }) => {
           </div>
         )}
 
-        {section.items.length === 0 && !isOver && (
+        {section.items && section.items.length === 0 && !isOver && (
           <div className={clsx(
             'text-center py-8 transition-colors duration-200 rounded-lg border border-white/10',
             'text-white/40'
@@ -119,4 +113,4 @@ const Section: React.FC<SectionProps> = ({ section, startTime }) => {
   );
 };
 
-export default Section;
+export default ScheduleSection;

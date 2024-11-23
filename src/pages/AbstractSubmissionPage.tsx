@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AbstractForm from '@/components/abstracts/AbstractForm';
 import LoadingSpinner from '@/components/common/LoadingSpinner';

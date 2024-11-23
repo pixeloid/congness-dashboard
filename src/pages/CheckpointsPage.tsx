@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useCheckpointStore } from '@/store/checkpointStore';
 import CheckpointList from '@/components/checkpoints/CheckpointList';
@@ -12,11 +12,11 @@ import { useState } from 'react';
 const CheckpointsPage = () => {
   const { occasionId } = useParams<{ occasionId: string }>();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  
-  const { 
-    checkpoints, 
+
+  const {
+    checkpoints,
     filters,
-    isLoading, 
+    isLoading,
     error,
     actions: {
       fetchCheckpoints,

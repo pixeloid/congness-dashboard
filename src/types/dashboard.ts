@@ -1,5 +1,4 @@
-import { ComponentType } from 'react';
-import { IconProps } from '@heroicons/react/24/outline';
+import { IconType } from 'react-icons';
 
 export interface DashboardStat {
   label: string;
@@ -15,8 +14,8 @@ export interface DashboardAction {
 export interface DashboardSection {
   id: string;
   title: string;
-  description: string;
-  icon: ComponentType<IconProps>;
+  icon: IconType;
   stats?: DashboardStat[];
   actions?: DashboardAction[];
+  description: string;
 }

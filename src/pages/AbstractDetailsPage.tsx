@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAbstractStore } from '@/store/abstractStore';
 import { useAuthStore } from '@/store/authStore';
@@ -15,9 +15,9 @@ const AbstractDetailsPage = () => {
   const { abstractId } = useParams<{ abstractId: string }>();
   const navigate = useNavigate();
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
-  
+
   const { user } = useAuthStore();
-  const { 
+  const {
     abstracts,
     reviews,
     isLoading,
@@ -136,7 +136,7 @@ const AbstractDetailsPage = () => {
 
         <ReviewList
           reviews={reviews}
-          onSelect={() => {/* TODO: Implement review details/edit */}}
+          onSelect={() => {/* TODO: Implement review details/edit */ }}
         />
       </div>
 

@@ -1,16 +1,23 @@
 export interface ScheduleItem {
   id: string;
+  description?: string;
   title: string;
   duration: number;
-  type: 'meal' | 'break' | 'coffee' | 'lunch' | 'roundtable' | 'workshop' | 
-        'assembly' | 'optional' | 'social' | 'session';
+  type: ScheduleItemType;
   isTemplate?: boolean;
+  items?: ScheduleItem[];
 }
+
+type ScheduleItemType = 'meal' | 'break' | 'coffee' | 'lunch' | 'roundtable' | 'workshop' |
+  'assembly' | 'optional' | 'social' | 'session';
+
 
 export interface Section {
   id: string;
   title: string;
-  description: string;
+  description?: string;
+  type: ScheduleItemType;
+  duration: number;
   chairs?: string;
   items: ScheduleItem[];
 }

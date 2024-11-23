@@ -23,10 +23,10 @@ interface Action {
 interface DashboardSection {
   id: string;
   title: string;
-  description: string;
-  icon: React.ComponentType;
+  icon: any;
   stats: Stat[];
   actions: Action[];
+  description: string;
 }
 
 export const dashboardSections: DashboardSection[] = [

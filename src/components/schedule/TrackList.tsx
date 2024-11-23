@@ -2,11 +2,11 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-import Section from './Section';
 import DraggableScheduleItem from './DraggableScheduleItem';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { Track } from '@/types/schedule';
 import { useDndContext } from '@dnd-kit/core';
+import ScheduleSection from '@/components/schedule/ScheduleSection';
 
 interface TrackListProps {
   track: Track;
@@ -17,7 +17,7 @@ interface TrackListProps {
 const TrackList: React.FC<TrackListProps> = ({ track, dayStartTime, onAddSection }) => {
   let currentTime = new Date(dayStartTime);
   const { active } = useDndContext();
-  
+
   const { setNodeRef, isOver } = useDroppable({
     id: `track-${track.id}`,
     data: {
@@ -36,7 +36,7 @@ const TrackList: React.FC<TrackListProps> = ({ track, dayStartTime, onAddSection
   const showDropArea = isDragging;
 
   return (
-    <div 
+    <div
       ref={setNodeRef}
       className={clsx(
         'rounded-xl border transition-all duration-200',
@@ -65,7 +65,7 @@ const TrackList: React.FC<TrackListProps> = ({ track, dayStartTime, onAddSection
           </button>
         </div>
       </div>
-      
+
       <div
         className={clsx(
           'p-6 space-y-4 min-h-[200px] transition-colors duration-200',
@@ -79,7 +79,7 @@ const TrackList: React.FC<TrackListProps> = ({ track, dayStartTime, onAddSection
         <SortableContext items={sortableItems.map(item => item.id)} strategy={verticalListSortingStrategy}>
           {sortableItems.map((item) => {
             const itemStartTime = new Date(currentTime);
-            
+
             if (item.type === 'presentation') {
               currentTime = new Date(currentTime.getTime() + item.data.duration * 60000);
               return (
@@ -91,10 +91,10 @@ const TrackList: React.FC<TrackListProps> = ({ track, dayStartTime, onAddSection
                 />
               );
             } else {
-              const sectionDuration = item.data.items.reduce((total, presentation) => 
+              const sectionDuration = (item.data.items ?? []).reduce((total: number, presentation) =>
                 total + presentation.duration, 0);
               const sectionComponent = (
-                <Section
+                <ScheduleSection
                   key={item.id}
                   section={item.data}
                   startTime={itemStartTime}
@@ -107,7 +107,7 @@ const TrackList: React.FC<TrackListProps> = ({ track, dayStartTime, onAddSection
         </SortableContext>
 
         {showDropArea && (
-          <div 
+          <div
             className={clsx(
               'mt-4 text-center py-6 transition-colors duration-200 rounded-lg border-2 border-dashed',
               {

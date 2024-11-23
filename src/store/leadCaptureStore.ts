@@ -52,7 +52,7 @@ export const useLeadCaptureStore = create<LeadCaptureState>()(
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          set((state) => ({
+          set(() => ({
             leads: initialLeads.filter(l => l.exhibitionId === exhibitionId),
             isLoading: false
           }));

@@ -1,4 +1,3 @@
-import { Participant } from './participants';
 
 export type CheckpointType = 'registration' | 'dining' | 'program' | 'general';
 export type CheckpointStatus = 'active' | 'inactive' | 'scheduled';

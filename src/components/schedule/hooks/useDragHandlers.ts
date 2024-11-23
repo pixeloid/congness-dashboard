@@ -7,7 +7,7 @@ interface UseDragHandlersProps {
   days: Day[];
   setDays: (days: Day[]) => void;
   presentations: ScheduleItem[];
-  setPresentations: (presentations: ScheduleItem[]) => void;
+  setPresentations: (presentations: ScheduleItem[] | ((prev: ScheduleItem[]) => ScheduleItem[])) => void;
   templates: ScheduleItem[];
 }
 
@@ -47,7 +47,7 @@ export const useDragHandlers = ({
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     setActiveId(active.id.toString());
-    
+
     const item = findItem(active.id.toString());
     if (item) {
       setActiveItem(item);
@@ -56,7 +56,7 @@ export const useDragHandlers = ({
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (!over) {
       setActiveId(null);
       setActiveItem(null);
@@ -80,7 +80,7 @@ export const useDragHandlers = ({
       return;
     }
 
-    const newItem = sourceItem.isTemplate 
+    const newItem = sourceItem.isTemplate
       ? { ...sourceItem, id: uuidv4(), isTemplate: false }
       : { ...sourceItem };
 
@@ -120,7 +120,7 @@ export const useDragHandlers = ({
     setDays(updatedDays);
 
     if (itemAdded && !sourceItem.isTemplate) {
-      setPresentations(prev => prev.filter(p => p.id !== activeId));
+      setPresentations((prev: ScheduleItem[]) => prev.filter(p => p.id !== activeId));
     }
 
     setActiveId(null);

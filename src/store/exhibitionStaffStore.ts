@@ -66,7 +66,7 @@ export const useExhibitionStaffStore = create<ExhibitionStaffState>()(
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          set((state) => ({
+          set(() => ({
             staff: initialStaff.filter(s => s.exhibitionId === exhibitionId),
             isLoading: false
           }));

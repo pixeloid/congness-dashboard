@@ -1,4 +1,3 @@
-import React from 'react';
 import { useOccasionsStore } from '@/store/occasionsStore';
 import OccasionCard from '@/components/occasions/OccasionCard';
 import LoadingSpinner from '@/components/common/LoadingSpinner';

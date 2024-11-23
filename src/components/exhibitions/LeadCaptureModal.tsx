@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { LeadCapture } from '@/types/exhibitions';
 
 interface LeadCaptureModalProps {
   isOpen: boolean;
@@ -25,7 +24,7 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ isOpen, onClose, on
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-        
+
         <div className="relative bg-navy-light rounded-xl shadow-xl w-full max-w-md p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-display font-semibold text-white">
