@@ -1,17 +1,22 @@
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { format } from 'date-fns';
-import { hu } from 'date-fns/locale';
 import { useParticipantsStore } from '@/store/participantsStore';
 import ParticipantStatusBadge from '@/components/participants/ParticipantStatusBadge';
 import ParticipantRoleBadge from '@/components/participants/ParticipantRoleBadge';
 import ParticipantFilters from '@/components/participants/ParticipantFilters';
+import AddParticipantModal from '@/components/participants/AddParticipantModal';
+import ImportParticipantsModal from '@/components/participants/ImportParticipantsModal';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
-import { UserPlusIcon } from '@heroicons/react/24/outline';
-import { useEffect } from 'react';
+import { UserPlusIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
+import { format } from 'date-fns';
+import { hu } from 'date-fns/locale';
 
 const ParticipantsPage = () => {
   const { occasionId } = useParams<{ occasionId: string }>();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
   const {
     participants,
     filters,
@@ -20,6 +25,7 @@ const ParticipantsPage = () => {
     actions: {
       fetchParticipants,
       setFilters,
+      addParticipant,
       deleteParticipant
     }
   } = useParticipantsStore();
@@ -53,10 +59,22 @@ const ParticipantsPage = () => {
           <h1 className="text-4xl font-display font-bold text-white mb-2">Résztvevők</h1>
           <p className="text-lg text-white/70">Résztvevők kezelése és áttekintése</p>
         </div>
-        <button className="inline-flex items-center px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors">
-          <UserPlusIcon className="h-5 w-5 mr-2" />
-          <span>Új Résztvevő</span>
-        </button>
+        <div className="flex gap-4">
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="inline-flex items-center px-4 py-2 bg-navy/50 text-white rounded-lg border border-white/10 hover:border-accent/30 transition-colors"
+          >
+            <ArrowUpTrayIcon className="h-5 w-5 mr-2" />
+            <span>Import CSV</span>
+          </button>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="inline-flex items-center px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
+          >
+            <UserPlusIcon className="h-5 w-5 mr-2" />
+            <span>Új Résztvevő</span>
+          </button>
+        </div>
       </div>
 
       <ParticipantFilters filters={filters} onFilterChange={setFilters} />
@@ -112,6 +130,30 @@ const ParticipantsPage = () => {
           </table>
         </div>
       </div>
+
+      <AddParticipantModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={(participant) => {
+          addParticipant({
+            ...participant,
+            registrationDate: new Date().toISOString()
+          });
+        }}
+      />
+
+      <ImportParticipantsModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={(participants) => {
+          participants.forEach(participant => {
+            addParticipant({
+              ...participant,
+              registrationDate: new Date().toISOString()
+            });
+          });
+        }}
+      />
     </div>
   );
 };

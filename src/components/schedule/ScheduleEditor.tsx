@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { 
   DndContext, 
   DragOverlay,
@@ -13,20 +14,26 @@ import DaySection from './DaySection';
 import AddDayButton from './AddDayButton';
 import PresentationPool from './PresentationPool';
 import ScheduleItem from './ScheduleItem';
-import { useScheduleState } from './hooks/useScheduleState';
+import { useScheduleStore } from '@/store/scheduleStore';
 import { useDragHandlers } from './hooks/useDragHandlers';
+import { useParams } from 'react-router-dom';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 const ScheduleEditor = () => {
+  const { occasionId } = useParams<{ occasionId: string }>();
   const {
+    schedule,
     templates,
     presentations,
-    setPresentations,
-    days,
-    setDays,
-    handleAddDay,
-    handleAddTrack,
-    handleAddSection
-  } = useScheduleState();
+    isLoading,
+    actions
+  } = useScheduleStore();
+
+  useEffect(() => {
+    if (occasionId) {
+      actions.fetchSchedule(parseInt(occasionId, 10));
+    }
+  }, [occasionId, actions]);
 
   const {
     activeId,
@@ -34,10 +41,8 @@ const ScheduleEditor = () => {
     handleDragStart,
     handleDragEnd
   } = useDragHandlers({
-    days,
-    setDays,
+    schedule,
     presentations,
-    setPresentations,
     templates
   });
   
@@ -58,12 +63,29 @@ const ScheduleEditor = () => {
     })
   );
 
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!schedule) {
+    return (
+      <div className="p-6">
+        <button
+          onClick={() => occasionId && actions.initializeSchedule(parseInt(occasionId, 10))}
+          className="px-4 py-2 bg-accent text-navy-dark rounded-lg"
+        >
+          Initialize Schedule
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="bg-navy/30 backdrop-blur-md rounded-xl p-6 border border-white/10">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-display font-bold text-white">Conference Schedule</h2>
-          <AddDayButton onAdd={handleAddDay} />
+          <AddDayButton onAdd={actions.addDay} />
         </div>
         
         <DndContext
@@ -78,12 +100,12 @@ const ScheduleEditor = () => {
           />
           
           <div className="space-y-8">
-            {days.map((day) => (
+            {schedule.days.map((day) => (
               <DaySection
                 key={day.id}
                 day={day}
-                onAddTrack={handleAddTrack}
-                onAddSection={handleAddSection}
+                onAddTrack={actions.addTrack}
+                onAddSection={(trackId) => actions.addSection(day.id, trackId)}
               />
             ))}
           </div>

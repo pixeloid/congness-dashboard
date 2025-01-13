@@ -1,0 +1,12 @@
+{
+    "configurations": [
+    {
+        "name": "Attach to Chrome",
+        "url": "http://localhost:5173",
+        "request": "launch",
+        "webRoot": "${workspaceFolder}",
+        "sourceMaps": true,
+        "type": "chrome",
+    }
+    ]
+}

@@ -22,6 +22,17 @@ const ExhibitionCard: React.FC<ExhibitionCardProps> = ({ exhibition }) => {
   const { actions } = useExhibitionsStore();
   const leadCaptureActions = useLeadCaptureStore(state => state.actions);
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(exhibition.name);
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    actions.updateExhibition(exhibition.id, { name });
+    setIsEditing(false);
+  };
 
   const handleCaptureLead = (participantId: number, notes: string) => {
     leadCaptureActions.captureLead(
@@ -48,9 +59,27 @@ const ExhibitionCard: React.FC<ExhibitionCardProps> = ({ exhibition }) => {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent" />
-        <h3 className="absolute bottom-4 left-4 right-4 text-xl font-display font-semibold text-white">
-          {exhibition.name}
-        </h3>
+        {isEditing ? (
+          <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="flex-1 px-3 py-1 bg-navy/50 border border-white/10 rounded text-white"
+              autoFocus
+            />
+            <button
+              onClick={handleSave}
+              className="px-3 py-1 bg-accent text-navy-dark rounded"
+            >
+              Save
+            </button>
+          </div>
+        ) : (
+          <h3 className="absolute bottom-4 left-4 right-4 text-xl font-display font-semibold text-white">
+            {exhibition.name}
+          </h3>
+        )}
       </div>
 
       <div className="p-6 space-y-4">
@@ -72,7 +101,7 @@ const ExhibitionCard: React.FC<ExhibitionCardProps> = ({ exhibition }) => {
 
         <div className="pt-4 grid grid-cols-2 gap-2">
           <button 
-            onClick={() => actions.updateExhibition(exhibition.id, {})}
+            onClick={handleEdit}
             className="inline-flex items-center justify-center px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
           >
             <PencilIcon className="h-5 w-5 mr-2" />

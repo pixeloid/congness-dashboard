@@ -12,19 +12,62 @@ export interface Venue {
   url: string;
 }
 
+export interface Contact {
+  name: string;
+  email: string;
+}
+
+// Core Occasion type that connects all related entities
 export interface Occasion {
   id: number;
   name: string;
+  subtitle?: string;
+  description?: string;
+  url?: string;
+  logo?: string;
   startDate: string;
   endDate: string;
   venue: Venue;
+  contact: Contact;
+  
+  // Related entities
+  schedule?: {
+    id: string;
+    days: any[]; // Imported from schedule types
+  };
+  abstracts?: {
+    id: number;
+    title: string;
+    status: string;
+  }[];
+  exhibitions?: {
+    id: number;
+    name: string;
+    exhibitors: {
+      id: number;
+      name: string;
+    }[];
+    hunts?: {
+      id: number;
+      name: string;
+    }[];
+  }[];
+  checkpoints?: {
+    id: number;
+    name: string;
+    type: string;
+  }[];
+  participants?: {
+    id: number;
+    name: string;
+    role: string;
+  }[];
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  meta?: {
-    total: number;
-    page: number;
-    perPage: number;
-  };
+// Store state interface
+export interface OccasionState {
+  occasions: Occasion[];
+  selectedOccasion: Occasion | null;
+  isLoading: boolean;
+  error: string | null;
 }

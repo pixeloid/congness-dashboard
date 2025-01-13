@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { v4 as uuidv4 } from 'uuid';
-import { Day, ScheduleItem } from '@/types/schedule';
+import { ScheduleItem } from '@/types/schedule';
+import { useScheduleStore } from '@/store/scheduleStore';
 
 interface UseDragHandlersProps {
-  days: Day[];
-  setDays: (days: Day[]) => void;
+  schedule: any;
   presentations: ScheduleItem[];
-  setPresentations: (presentations: ScheduleItem[] | ((prev: ScheduleItem[]) => ScheduleItem[])) => void;
   templates: ScheduleItem[];
 }
 
@@ -15,23 +14,25 @@ interface DropTarget {
   type: string;
   trackId?: string;
   sectionId?: string;
+  dayId?: string;
 }
 
 export const useDragHandlers = ({
-  days,
-  setDays,
+  schedule,
   presentations,
-  setPresentations,
   templates
 }: UseDragHandlersProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeItem, setActiveItem] = useState<ScheduleItem | null>(null);
+  const { actions } = useScheduleStore();
 
   const findItem = (id: string): ScheduleItem | undefined => {
     const poolItem = [...presentations, ...templates].find(p => p.id === id);
     if (poolItem) return poolItem;
 
-    for (const day of days) {
+    if (!schedule?.days) return undefined;
+
+    for (const day of schedule.days) {
       for (const track of day.tracks) {
         const trackItem = track.presentations.find(p => p.id === id);
         if (trackItem) return trackItem;
@@ -57,7 +58,7 @@ export const useDragHandlers = ({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over) {
+    if (!over || !schedule?.days) {
       setActiveId(null);
       setActiveItem(null);
       return;
@@ -80,48 +81,18 @@ export const useDragHandlers = ({
       return;
     }
 
+    // Extract day ID from track or section ID
+    const dayId = targetData.dayId || overId.split('-')[1];
+    const trackId = targetData.trackId || overId.split('-')[2];
+    const sectionId = targetData.type === 'section' ? overId.split('-')[2] : null;
+
+    // Create new item if it's a template
     const newItem = sourceItem.isTemplate
       ? { ...sourceItem, id: uuidv4(), isTemplate: false }
       : { ...sourceItem };
 
-    let itemAdded = false;
-
-    const updatedDays = days.map(day => ({
-      ...day,
-      tracks: day.tracks.map(track => {
-        if (targetData.type === 'track' && `track-${track.id}` === overId) {
-          itemAdded = true;
-          return {
-            ...track,
-            presentations: [...track.presentations, newItem]
-          };
-        }
-
-        if (targetData.type === 'section') {
-          return {
-            ...track,
-            sections: track.sections.map(section => {
-              if (`section-${section.id}` === overId) {
-                itemAdded = true;
-                return {
-                  ...section,
-                  items: [...section.items, newItem]
-                };
-              }
-              return section;
-            })
-          };
-        }
-
-        return track;
-      })
-    }));
-
-    setDays(updatedDays);
-
-    if (itemAdded && !sourceItem.isTemplate) {
-      setPresentations((prev: ScheduleItem[]) => prev.filter(p => p.id !== activeId));
-    }
+    // Add item to the target location
+    actions.addItem(dayId, trackId, sectionId, newItem);
 
     setActiveId(null);
     setActiveItem(null);

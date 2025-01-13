@@ -1,3 +1,7 @@
+// Item types
+export type ScheduleItemType = 'meal' | 'break' | 'coffee' | 'lunch' | 'roundtable' | 'workshop' |
+  'assembly' | 'optional' | 'social' | 'session';
+
 export interface ScheduleItem {
   id: string;
   description?: string;
@@ -7,10 +11,6 @@ export interface ScheduleItem {
   isTemplate?: boolean;
   items?: ScheduleItem[];
 }
-
-type ScheduleItemType = 'meal' | 'break' | 'coffee' | 'lunch' | 'roundtable' | 'workshop' |
-  'assembly' | 'optional' | 'social' | 'session';
-
 
 export interface Section {
   id: string;
@@ -34,6 +34,12 @@ export interface Day {
   date: Date;
   startTime: Date;
   tracks: Track[];
+}
+
+export interface Schedule {
+  id: string;
+  occasionId: number;
+  days: Day[];
 }
 
 export interface DraggableItemProps {

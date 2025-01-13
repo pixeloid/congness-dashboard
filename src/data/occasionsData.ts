@@ -4,6 +4,10 @@ export const occasions: Occasion[] = [
   {
     id: 1,
     name: "Nemzetközi Orvosi Konferencia 2024",
+    subtitle: "Innovációk az egészségügyben",
+    description: "A legújabb orvosi technológiák és kutatási eredmények bemutatása",
+    url: "https://medconf2024.hu",
+    logo: "/logos/medconf.png",
     startDate: "2024-03-15",
     endDate: "2024-03-17",
     venue: {
@@ -16,11 +20,19 @@ export const occasions: Occasion[] = [
       photo: "https://via.placeholder.com/150",
       description: "Modern konferenciaközpont a város szívében",
       url: "https://bcc.hu"
+    },
+    contact: {
+      name: "Dr. Nagy János",
+      email: "nagy.janos@medconf.hu"
     }
   },
   {
     id: 2,
     name: "Tech Summit Budapest",
+    subtitle: "A jövő technológiái",
+    description: "Technológiai újítások és digitális transzformáció",
+    url: "https://techsummit.hu",
+    logo: "/logos/techsummit.png",
     startDate: "2024-06-20",
     endDate: "2024-06-22",
     venue: {
@@ -33,6 +45,10 @@ export const occasions: Occasion[] = [
       photo: "https://via.placeholder.com/150",
       description: "Magyarország legnagyobb kiállítási központja",
       url: "https://hungexpo.hu"
+    },
+    contact: {
+      name: "Kiss Éva",
+      email: "kiss.eva@techsummit.hu"
     }
   }
 ];

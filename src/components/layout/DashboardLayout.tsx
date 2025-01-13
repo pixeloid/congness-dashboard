@@ -1,89 +1,210 @@
-import React from 'react';
-import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, Link, useNavigate, useParams } from 'react-router-dom';
 import { 
-  HomeIcon, 
-  CalendarIcon, 
-  BuildingOfficeIcon,
+  ArrowsRightLeftIcon,
+  ChartBarIcon,
+  CalendarIcon,
+  UserGroupIcon,
+  DocumentTextIcon,
+  MapPinIcon,
   BuildingStorefrontIcon,
-  UserCircleIcon,
-  ArrowRightOnRectangleIcon
+  UserIcon,
+  Bars3Icon,
+  XMarkIcon,
+  CogIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline';
-import Logo from '../common/Logo';
+import Logo from '@/components/common/Logo';
+import ThemeToggle from '@/components/common/ThemeToggle';
+import { useOccasionsStore } from '@/store/occasionsStore';
 import { useAuthStore } from '@/store/authStore';
-
-const navigation = [
-  { name: 'Irányítópult', href: '/dashboard', icon: HomeIcon },
-  { name: 'Program', href: '/schedule', icon: CalendarIcon },
-  { name: 'Események', href: '/occasions', icon: BuildingOfficeIcon },
-  { name: 'Kiállítások', href: '/exhibitions', icon: BuildingStorefrontIcon },
-];
+import { Occasion } from '@/types/occasions';
+import clsx from 'clsx';
 
 const DashboardLayout: React.FC = () => {
-  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [abstractsOpen, setAbstractsOpen] = useState(false);
+  const { occasionId } = useParams<{ occasionId: string }>();
+  const { occasions, actions: { setSelectedOccasion } } = useOccasionsStore();
+  const { user, actions: { logout } } = useAuthStore();
   const navigate = useNavigate();
-  const { user, actions } = useAuthStore();
 
-  const handleLogout = () => {
-    actions.logout();
-    navigate('/login');
+  useEffect(() => {
+    if (occasionId) {
+      const currentOccasion = occasions.find(o => o.id === parseInt(occasionId));
+      if (currentOccasion) {
+        setSelectedOccasion(currentOccasion);
+      }
+    }
+  }, [occasionId, occasions, setSelectedOccasion]);
+
+  const currentOccasion:Occasion = occasions.find(o => o.id === parseInt(occasionId || ''));
+
+  const handleSwitchOccasion = () => {
+    navigate('/select-occasion');
   };
 
+  const navigationItems = [
+    { name: 'Irányítópult', href: `dashboard`, icon: ChartBarIcon },
+    { name: 'Program', href: `schedule`, icon: CalendarIcon },
+    { name: 'Résztvevők', href: `participants`, icon: UserGroupIcon },
+    { name: 'Checkpointok', href: `checkpoints`, icon: MapPinIcon },
+    { name: 'Kiállítások', href: `exhibitions`, icon: BuildingStorefrontIcon },
+  ];
+
+  const abstractItems = [
+    { name: 'Absztraktok', href: 'abstracts', icon: DocumentTextIcon },
+    { name: 'Absztrakt Feltöltés', href: 'abstracts/submit?token=pending-token', icon: DocumentTextIcon },
+    { name: 'Absztrakt Beállítások', href: 'abstracts/settings', icon: CogIcon },
+  ];
+
   return (
-    <div className="min-h-screen bg-navy-dark">
-      <div className="fixed inset-0 bg-gradient-radial from-navy via-primary to-navy opacity-80 pointer-events-none z-0"></div>
-      <div className="fixed inset-0 bg-gradient-conic from-accent/20 via-secondary/20 to-accent/20 opacity-30 blur-3xl pointer-events-none z-0"></div>
-      
-      <div className="relative z-10 flex flex-col min-h-screen">
-        <nav className="sticky top-0 z-50 bg-navy/50 backdrop-blur-sm border-b border-white/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-20">
-              <div className="flex items-center space-x-8">
-                <Logo className="h-12 w-auto" />
-                <div className="hidden md:flex space-x-4">
-                  {navigation.map((item) => {
-                    const isActive = location.pathname === item.href;
+    <div className="min-h-screen bg-fixed bg-background-light dark:bg-background-dark">
+      {/* Background gradients */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-radial from-accent/20 via-transparent to-transparent opacity-20" />
+        <div className="absolute right-0 top-0 h-96 w-96 bg-gradient-radial from-secondary/20 via-transparent to-transparent opacity-20" />
+        <div className="absolute left-1/2 bottom-0 h-96 w-96 -translate-x-1/2 bg-gradient-radial from-accent/20 via-transparent to-transparent opacity-20" />
+      </div>
+
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Mobile menu button */}
+      <button
+        className="fixed top-4 left-4 z-50 p-2 text-white/70 hover:text-white lg:hidden"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        {sidebarOpen ? (
+          <XMarkIcon className="h-6 w-6" />
+        ) : (
+          <Bars3Icon className="h-6 w-6" />
+        )}
+      </button>
+
+      {/* Sidebar */}
+      <div className={clsx(
+        'fixed inset-y-0 left-0 z-50 w-64 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm transform transition-transform duration-300 lg:translate-x-0',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      )}>
+        <div className="flex flex-col h-full">
+          {/* Header section */}
+          <div className="border-b border-white/10">
+            <div className="p-4">
+              <Logo className="h-8 w-auto" />
+            </div>
+            
+            <div className="px-4 pb-4">
+              <h2 className="text-lg font-display font-bold text-foreground-light dark:text-foreground-dark">
+                {currentOccasion?.name}
+              </h2>
+              <button
+                onClick={handleSwitchOccasion}
+                className="mt-1 inline-flex items-center text-sm text-foreground-light/70 dark:text-foreground-dark/70 hover:text-accent transition-colors"
+              >
+                <ArrowsRightLeftIcon className="h-4 w-4 mr-1" />
+                <span>Váltás</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-4 pt-4 space-y-1 overflow-y-auto">
+            {navigationItems.map((item) => {
+              const href = `/occasions/${currentOccasion?.id}/${item.href}`;
+              return (
+                <Link
+                  key={item.name}
+                  to={href}
+                  className="flex items-center px-3 py-2 text-sm text-foreground-light/70 dark:text-foreground-dark/70 rounded-lg hover:bg-white/10 hover:text-accent transition-colors"
+                >
+                  <item.icon className="h-5 w-5 mr-3" />
+                  {item.name}
+                </Link>
+              );
+            })}
+
+            {/* Abstracts Dropdown */}
+            <div>
+              <button
+                onClick={() => setAbstractsOpen(!abstractsOpen)}
+                className="w-full flex items-center justify-between px-3 py-2 text-sm text-foreground-light/70 dark:text-foreground-dark/70 rounded-lg hover:bg-white/10 hover:text-accent transition-colors"
+              >
+                <div className="flex items-center">
+                  <DocumentTextIcon className="h-5 w-5 mr-3" />
+                  <span>Absztraktok</span>
+                </div>
+                <ChevronDownIcon 
+                  className={clsx(
+                    "h-4 w-4 transition-transform duration-200",
+                    abstractsOpen ? "transform rotate-180" : ""
+                  )}
+                />
+              </button>
+              
+              {abstractsOpen && (
+                <div className="ml-4 mt-1 space-y-1">
+                  {abstractItems.map((item) => {
+                    const href = `/occasions/${currentOccasion?.id}/${item.href}`;
                     return (
                       <Link
                         key={item.name}
-                        to={item.href}
-                        className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          isActive
-                            ? 'bg-accent text-navy-dark'
-                            : 'text-white/70 hover:text-white hover:bg-white/10'
-                        }`}
+                        to={href}
+                        className="flex items-center px-3 py-2 text-sm text-foreground-light/70 dark:text-foreground-dark/70 rounded-lg hover:bg-white/10 hover:text-accent transition-colors"
                       >
-                        <item.icon className="h-5 w-5 mr-2" />
+                        <item.icon className="h-4 w-4 mr-3" />
                         {item.name}
                       </Link>
                     );
                   })}
                 </div>
-              </div>
+              )}
+            </div>
+          </nav>
 
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/profile"
-                  className="flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-                >
-                  <UserCircleIcon className="h-5 w-5 mr-2" />
-                  {user?.name}
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-                >
-                  <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
-                  Kijelentkezés
-                </button>
+          {/* User section */}
+          <div className="p-4 border-t border-white/10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <UserIcon className="h-8 w-8 text-accent" />
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-foreground-light dark:text-foreground-dark">
+                    {user?.name}
+                  </p>
+                  <p className="text-xs text-foreground-light/70 dark:text-foreground-dark/70">
+                    {user?.email}
+                  </p>
+                </div>
               </div>
+              <ThemeToggle />
+            </div>
+            <div className="mt-4 flex items-center justify-between">
+              <Link
+                to="/profile"
+                className="text-sm text-foreground-light/70 dark:text-foreground-dark/70 hover:text-accent transition-colors"
+              >
+                Profil
+              </Link>
+              <button
+                onClick={logout}
+                className="text-sm text-foreground-light/70 dark:text-foreground-dark/70 hover:text-accent transition-colors"
+              >
+                Kijelentkezés
+              </button>
             </div>
           </div>
-        </nav>
-        
-        <main className="flex-1 relative z-20">
-          <div className="max-w-7xl mx-auto p-6">
-            <Outlet />
-          </div>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        <main className="min-h-screen">
+          <Outlet />
         </main>
       </div>
     </div>
