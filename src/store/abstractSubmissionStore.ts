@@ -53,7 +53,7 @@ const dummyInvitations: AbstractInvitation[] = [
   },
   {
     id: 2,
-    email: "accepted@example.com", 
+    email: "accepted@example.com",
     token: "accepted-token",
     occasionId: 1,
     categoryId: 1,
@@ -65,7 +65,7 @@ const dummyInvitations: AbstractInvitation[] = [
   {
     id: 3,
     email: "rejected@example.com",
-    token: "rejected-token", 
+    token: "rejected-token",
     occasionId: 1,
     categoryId: 1,
     status: "rejected",
@@ -77,7 +77,7 @@ const dummyInvitations: AbstractInvitation[] = [
     id: 4,
     email: "expired@example.com",
     token: "expired-token",
-    occasionId: 1, 
+    occasionId: 1,
     categoryId: 1,
     status: "expired",
     expiresAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
@@ -96,14 +96,17 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
       fetchSubmissionProcess: async (occasionId) => {
         set({ isLoading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Simulate API call with shorter delay
+          await new Promise(resolve => setTimeout(resolve, 100));
           set(state => {
             state.process = {
               id: 1,
               occasionId,
               isPublic: false,
+              submissionDeadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
               startDate: new Date().toISOString(),
               endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              reviewDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days for testing
               maxAbstracts: 3,
               categories: dummyCategories,
               guidelines: "Sample guidelines"
@@ -114,20 +117,20 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
           set({ error: 'Failed to fetch submission process', isLoading: false });
         }
       },
-  updateSubmissionProcess: async (occasionId: number, updates: Partial<AbstractSubmissionProcess>) => {
-    set({ isLoading: true, error: null });
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      set(state => {
-        if (state.process && state.process.occasionId === occasionId) {
-          state.process = { ...state.process, ...updates };
+      updateSubmissionProcess: async (occasionId: number, updates: Partial<AbstractSubmissionProcess>) => {
+        set({ isLoading: true, error: null });
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          set(state => {
+            if (state.process && state.process.occasionId === occasionId) {
+              state.process = { ...state.process, ...updates };
+            }
+            state.isLoading = false;
+          });
+        } catch (error) {
+          set({ error: 'Failed to update submission process', isLoading: false });
         }
-        state.isLoading = false;
-      });
-    } catch (error) {
-      set({ error: 'Failed to update submission process', isLoading: false });
-    }
-  },
+      },
 
       fetchCategories: async (occasionId) => {
         set({ isLoading: true, error: null });

@@ -7,21 +7,32 @@ import clsx from 'clsx';
 
 interface ReviewListProps {
   reviews: Review[];
+  currentUserId?: number;
   onSelect: (review: Review) => void;
 }
 
-const ReviewList: React.FC<ReviewListProps> = ({ reviews, onSelect }) => {
+const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, onSelect }) => {
   return (
     <div className="space-y-4">
       {reviews.map((review) => (
         <div
           key={review.id}
-          className="p-6 bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 hover:border-accent/30 transition-all cursor-pointer"
+          className={clsx(
+            "p-6 bg-navy/30 backdrop-blur-md rounded-xl border transition-all cursor-pointer",
+            review.reviewerId === currentUserId
+              ? "border-accent/30 bg-accent/5"
+              : "border-white/10 hover:border-accent/30"
+          )}
           onClick={() => onSelect(review)}
         >
           <div className="flex justify-between items-start mb-4">
             <div>
               <div className="flex items-center gap-4 mb-2">
+                {review.reviewerId === currentUserId && (
+                  <span className="px-2 py-1 text-xs bg-accent/10 text-accent rounded-full border border-accent/20">
+                    Your Review
+                  </span>
+                )}
                 <span className="text-xl font-display font-semibold text-white">
                   Rating: {review.rating}/10
                 </span>

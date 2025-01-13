@@ -8,12 +8,14 @@ import InviteSubmitterModal from '@/components/abstracts/InviteSubmitterModal';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { PlusIcon, EnvelopeIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { format } from 'date-fns';
+import { AbstractCategory } from '@/types/abstractSubmission';
 
 const AbstractSubmissionSettingsPage = () => {
   const { occasionId } = useParams<{ occasionId: string }>();
   const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategory, setEditingCategory] = useState<AbstractCategory | undefined>(undefined);
   const [showCopied, setShowCopied] = useState(false);
 
   const {
@@ -38,6 +40,18 @@ const AbstractSubmissionSettingsPage = () => {
     if (process && occasionId) {
       actions.updateSubmissionProcess(parseInt(occasionId), {
         isPublic: !process.isPublic
+      });
+    }
+  };
+
+  const handleDeadlineChange = (field: 'submissionDeadline' | 'reviewDeadline', value: string) => {
+    if (process && occasionId) {
+      const newDate = new Date(value);
+      // Ensure end of day for deadlines
+      newDate.setHours(23, 59, 59, 999);
+
+      actions.updateSubmissionProcess(parseInt(occasionId), {
+        [field]: newDate.toISOString()
       });
     }
   };
@@ -67,16 +81,69 @@ const AbstractSubmissionSettingsPage = () => {
             <h2 className="text-2xl font-bold text-white">Submission Process</h2>
             <p className="text-white/70 mt-1">Configure how abstracts can be submitted</p>
           </div>
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2">
+        </div>
+
+        <div className="space-y-6">
+          {/* Deadlines */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1">
+                Abstract Submission Deadline*
+              </label>
               <input
-                type="checkbox"
-                checked={process?.isPublic}
-                onChange={handleTogglePublic}
-                className="h-4 w-4 rounded border-white/10 bg-navy/30 text-accent"
+                type="datetime-local"
+                value={process?.submissionDeadline ? format(new Date(process.submissionDeadline), "yyyy-MM-dd'T'HH:mm") : ''}
+                onChange={(e) => handleDeadlineChange('submissionDeadline', e.target.value)}
+                className="w-full px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white"
+                required
               />
-              <span className="text-white">Allow Public Submissions</span>
-            </label>
+              <p className="mt-1 text-sm text-white/50">
+                After this date, no new submissions will be accepted
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1">
+                Review Period Deadline*
+              </label>
+              <input
+                type="datetime-local"
+                value={process?.reviewDeadline ? format(new Date(process.reviewDeadline), "yyyy-MM-dd'T'HH:mm") : ''}
+                onChange={(e) => handleDeadlineChange('reviewDeadline', e.target.value)}
+                className="w-full px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white"
+                required
+              />
+              <p className="mt-1 text-sm text-white/50">
+                After this date, chief reviewer can make final decisions
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 p-4 bg-navy/50 rounded-lg border border-white/10">
+            <h3 className="text-lg font-medium text-white mb-2">Deadline Information</h3>
+            <ul className="space-y-2 text-sm text-white/70">
+              <li>• Submission deadline: No new abstracts can be submitted after this date</li>
+              <li>• Review deadline: Scientific reviewers can submit reviews until this date</li>
+              <li>• Chief reviewer can make final decisions only after review deadline</li>
+              <li>• All deadlines are set to end of day (23:59:59)</li>
+            </ul>
+          </div>
+
+          {/* Public Submission Toggle */}
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={process?.isPublic}
+                  onChange={handleTogglePublic}
+                  className="h-4 w-4 rounded border-white/10 bg-navy/30 text-accent"
+                />
+                <span className="text-white">Allow Public Submissions</span>
+              </label>
+              <p className="text-sm text-white/70 mt-1">
+                Enable this to allow submissions without invitations
+              </p>
+            </div>
             {process?.isPublic && (
               <button
                 onClick={copyPublicUrl}
@@ -136,7 +203,7 @@ const AbstractSubmissionSettingsPage = () => {
         isOpen={isCategoryFormOpen}
         onClose={() => {
           setIsCategoryFormOpen(false);
-          setEditingCategory(null);
+          setEditingCategory(undefined);
         }}
         onSubmit={(category) => {
           if (editingCategory) {
@@ -145,7 +212,7 @@ const AbstractSubmissionSettingsPage = () => {
             actions.addCategory(category);
           }
           setIsCategoryFormOpen(false);
-          setEditingCategory(null);
+          setEditingCategory(undefined);
         }}
         initialData={editingCategory}
       />

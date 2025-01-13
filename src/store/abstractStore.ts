@@ -3,6 +3,46 @@ import { immer } from 'zustand/middleware/immer';
 import { Abstract, Review } from '@/types/abstract';
 import { abstracts as initialAbstracts } from '@/data/abstractsData';
 
+// Mock review data
+const initialReviews: Review[] = [
+  {
+    id: 1,
+    abstractId: 1,
+    reviewerId: 1,
+    rating: 8,
+    comments: "Strong methodology and clear results",
+    recommendation: 'accept',
+    status: 'completed',
+    assignedAt: "2024-01-16T10:00:00Z",
+    completedAt: "2024-01-18T15:30:00Z",
+    deadline: "2024-01-20T23:59:59Z"
+  },
+  {
+    id: 2,
+    abstractId: 1,
+    reviewerId: 2,
+    rating: 9,
+    comments: "Excellent contribution to the field",
+    recommendation: 'accept',
+    status: 'completed',
+    assignedAt: "2024-01-16T10:00:00Z",
+    completedAt: "2024-01-17T14:20:00Z",
+    deadline: "2024-01-20T23:59:59Z"
+  },
+  {
+    id: 3,
+    abstractId: 2,
+    reviewerId: 1,
+    rating: 6,
+    comments: "Needs minor revisions",
+    recommendation: 'revise',
+    status: 'completed',
+    assignedAt: "2024-01-16T10:00:00Z",
+    completedAt: "2024-01-19T11:45:00Z",
+    deadline: "2024-01-20T23:59:59Z"
+  }
+];
+
 interface AbstractState {
   abstracts: Abstract[];
   reviews: Review[];
@@ -21,7 +61,7 @@ interface AbstractState {
 export const useAbstractStore = create<AbstractState>()(
   immer((set) => ({
     abstracts: initialAbstracts,
-    reviews: [],
+    reviews: initialReviews,
     isLoading: false,
     error: null,
     actions: {
@@ -44,7 +84,7 @@ export const useAbstractStore = create<AbstractState>()(
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
           set(state => {
-            state.reviews = []; // Replace with actual reviews
+            state.reviews = initialReviews.filter(r => r.abstractId === abstractId);
             state.isLoading = false;
           });
         } catch (error) {
@@ -81,7 +121,8 @@ export const useAbstractStore = create<AbstractState>()(
               ...review,
               id: newId,
               status: 'completed',
-              assignedAt: new Date().toISOString()
+              assignedAt: new Date().toISOString(),
+              completedAt: new Date().toISOString()
             });
             state.isLoading = false;
           });

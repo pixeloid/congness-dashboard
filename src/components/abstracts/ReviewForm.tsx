@@ -32,9 +32,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, initialData }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-white/70 mb-1">
-          Rating (1-10)
-        </label>
+        <label className="block text-sm font-medium text-white/70 mb-1">Értékelés (1-10)</label>
         <input
           type="number"
           min="1"
@@ -47,9 +45,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, initialData }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-white/70 mb-1">
-          Comments
-        </label>
+        <label className="block text-sm font-medium text-white/70 mb-1">Megjegyzések</label>
         <textarea
           value={comments}
           onChange={(e) => setComments(e.target.value)}
@@ -60,18 +56,16 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, initialData }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-white/70 mb-1">
-          Recommendation
-        </label>
+        <label className="block text-sm font-medium text-white/70 mb-1">Javaslat</label>
         <select
           value={recommendation}
           onChange={(e) => setRecommendation(e.target.value as 'accept' | 'reject' | 'revise')}
           className="w-full px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white"
           required
         >
-          <option value="accept">Accept</option>
-          <option value="reject">Reject</option>
-          <option value="revise">Revise</option>
+          <option value="accept">Elfogadás</option>
+          <option value="reject">Elutasítás</option>
+          <option value="revise">Átdolgozás</option>
         </select>
       </div>
 
@@ -80,7 +74,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, initialData }) => {
           type="submit"
           className="px-6 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light"
         >
-          Submit Review
+          Bírálat beküldése
         </button>
       </div>
     </form>

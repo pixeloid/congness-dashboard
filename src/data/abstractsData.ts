@@ -3,9 +3,9 @@ import { Abstract } from '@/types/abstract';
 export const abstracts: Abstract[] = [
   {
     id: 1,
-    title: "Novel Approaches in Medical Imaging",
-    description: "This study presents innovative techniques in medical imaging using AI-driven analysis.",
-    keywords: ["medical imaging", "AI", "healthcare"],
+    title: "Új megközelítések az orvosi képalkotásban",
+    description: "A tanulmány innovatív technikákat mutat be az AI-vezérelt orvosi képalkotásban.",
+    keywords: ["orvosi képalkotás", "mesterséges intelligencia", "egészségügy"],
     authors: [
       {
         id: 1,
@@ -15,23 +15,22 @@ export const abstracts: Abstract[] = [
         isPresenting: true
       }
     ],
-    status: "accepted",
+    status: "in_review",
     submittedAt: "2024-01-15T10:30:00Z",
     submitterId: 1,
     occasionId: 1,
     presentationType: "oral"
   },
-  // From accepted invitation
   {
     id: 2,
-    title: "Machine Learning in Diagnostic Procedures",
-    description: "An overview of machine learning applications in modern medical diagnostics.",
-    keywords: ["machine learning", "diagnostics", "healthcare technology"],
+    title: "Gépi tanulás a diagnosztikai eljárásokban",
+    description: "A gépi tanulás alkalmazásainak áttekintése a modern orvosi diagnosztikában.",
+    keywords: ["gépi tanulás", "diagnosztika", "egészségügyi technológia"],
     authors: [
       {
         id: 2,
         name: "Dr. Johnson",
-        email: "accepted@example.com", // Matches accepted invitation
+        email: "accepted@example.com",
         affiliation: "Medical Research Institute",
         isPresenting: true
       }
@@ -41,17 +40,16 @@ export const abstracts: Abstract[] = [
     submitterId: 2,
     occasionId: 1
   },
-  // Another from accepted invitation
   {
     id: 3,
-    title: "Deep Learning for Medical Image Analysis",
-    description: "Exploring deep learning architectures for medical image segmentation and classification.",
-    keywords: ["deep learning", "medical imaging", "AI"],
+    title: "Mély tanulás az orvosi képelemzésben",
+    description: "Mély tanulási architektúrák feltárása orvosi képszegmentáláshoz és osztályozáshoz.",
+    keywords: ["mély tanulás", "orvosi képalkotás", "mesterséges intelligencia"],
     authors: [
       {
         id: 3,
         name: "Dr. Smith",
-        email: "accepted@example.com", // Same author, second abstract
+        email: "accepted@example.com",
         affiliation: "Medical Research Institute",
         isPresenting: true
       }
@@ -61,12 +59,11 @@ export const abstracts: Abstract[] = [
     submitterId: 2,
     occasionId: 1
   },
-  // Regular submission (no invitation)
   {
     id: 4,
-    title: "Clinical Trial Results: New Cancer Treatment",
-    description: "Results from a phase III clinical trial of a novel cancer treatment approach.",
-    keywords: ["clinical trial", "cancer", "treatment"],
+    title: "Klinikai vizsgálati eredmények: Új rákkezelés",
+    description: "Egy új rákkezelési megközelítés III. fázisú klinikai vizsgálatának eredményei.",
+    keywords: ["klinikai vizsgálat", "rák", "kezelés"],
     authors: [
       {
         id: 4,

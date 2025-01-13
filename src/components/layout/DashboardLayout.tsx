@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useParams } from 'react-router-dom';
-import { 
+import {
   ArrowsRightLeftIcon,
   ChartBarIcon,
   CalendarIcon,
@@ -18,7 +18,6 @@ import Logo from '@/components/common/Logo';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import { useOccasionsStore } from '@/store/occasionsStore';
 import { useAuthStore } from '@/store/authStore';
-import { Occasion } from '@/types/occasions';
 import clsx from 'clsx';
 
 const DashboardLayout: React.FC = () => {
@@ -29,33 +28,33 @@ const DashboardLayout: React.FC = () => {
   const { user, actions: { logout } } = useAuthStore();
   const navigate = useNavigate();
 
+  // Find the current occasion with proper type checking
+  const currentOccasion = occasionId ? occasions.find(o => o.id === parseInt(occasionId)) : null;
+
   useEffect(() => {
     if (occasionId) {
-      const currentOccasion = occasions.find(o => o.id === parseInt(occasionId));
       if (currentOccasion) {
         setSelectedOccasion(currentOccasion);
       }
     }
   }, [occasionId, occasions, setSelectedOccasion]);
 
-  const currentOccasion:Occasion = occasions.find(o => o.id === parseInt(occasionId || ''));
-
   const handleSwitchOccasion = () => {
     navigate('/select-occasion');
   };
 
   const navigationItems = [
-    { name: 'Irányítópult', href: `dashboard`, icon: ChartBarIcon },
-    { name: 'Program', href: `schedule`, icon: CalendarIcon },
+    { name: 'Vezérlőpult', href: `dashboard`, icon: ChartBarIcon },
+    { name: 'Időbeosztás', href: `schedule`, icon: CalendarIcon },
     { name: 'Résztvevők', href: `participants`, icon: UserGroupIcon },
-    { name: 'Checkpointok', href: `checkpoints`, icon: MapPinIcon },
-    { name: 'Kiállítások', href: `exhibitions`, icon: BuildingStorefrontIcon },
+    { name: 'Ellenőrzőpontok', href: `checkpoints`, icon: MapPinIcon },
+    { name: 'Kiállítók', href: `exhibitions`, icon: BuildingStorefrontIcon },
   ];
 
   const abstractItems = [
-    { name: 'Absztraktok', href: 'abstracts', icon: DocumentTextIcon },
-    { name: 'Absztrakt Feltöltés', href: 'abstracts/submit?token=pending-token', icon: DocumentTextIcon },
-    { name: 'Absztrakt Beállítások', href: 'abstracts/settings', icon: CogIcon },
+    { name: 'Összefoglalók', href: 'abstracts', icon: DocumentTextIcon },
+    { name: 'Összefoglaló feltöltése', href: 'abstracts/submit?token=pending-token', icon: DocumentTextIcon },
+    { name: 'Összefoglaló beállítások', href: 'abstracts/settings', icon: CogIcon },
   ];
 
   return (
@@ -69,7 +68,7 @@ const DashboardLayout: React.FC = () => {
 
       {/* Mobile backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -98,7 +97,7 @@ const DashboardLayout: React.FC = () => {
             <div className="p-4">
               <Logo className="h-8 w-auto" />
             </div>
-            
+
             <div className="px-4 pb-4">
               <h2 className="text-lg font-display font-bold text-foreground-light dark:text-foreground-dark">
                 {currentOccasion?.name}
@@ -116,7 +115,7 @@ const DashboardLayout: React.FC = () => {
           {/* Navigation */}
           <nav className="flex-1 px-4 pt-4 space-y-1 overflow-y-auto">
             {navigationItems.map((item) => {
-              const href = `/occasions/${currentOccasion?.id}/${item.href}`;
+              const href = currentOccasion ? `/occasions/${currentOccasion.id}/${item.href}` : '#';
               return (
                 <Link
                   key={item.name}
@@ -139,18 +138,18 @@ const DashboardLayout: React.FC = () => {
                   <DocumentTextIcon className="h-5 w-5 mr-3" />
                   <span>Absztraktok</span>
                 </div>
-                <ChevronDownIcon 
+                <ChevronDownIcon
                   className={clsx(
                     "h-4 w-4 transition-transform duration-200",
                     abstractsOpen ? "transform rotate-180" : ""
                   )}
                 />
               </button>
-              
+
               {abstractsOpen && (
                 <div className="ml-4 mt-1 space-y-1">
                   {abstractItems.map((item) => {
-                    const href = `/occasions/${currentOccasion?.id}/${item.href}`;
+                    const href = currentOccasion ? `/occasions/${currentOccasion.id}/${item.href}` : '#';
                     return (
                       <Link
                         key={item.name}

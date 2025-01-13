@@ -1,13 +1,15 @@
-export type UserRole = 'exhibitor' | 'exhibition_staff' | 'participant' | 'event_manager';
+export type UserRole = 'exhibitor' | 'exhibition_staff' | 'participant' | 'event_manager' | 'scientific_reviewer' | 'chief_reviewer';
 
 export interface User {
   id: number;
   name: string;
   email: string;
   role: UserRole;
-  exhibitionId?: number; // For exhibition staff
-  participantId?: number; // For participants
-  exhibitorId?: number; // For exhibitors
+  exhibitionId?: number;
+  participantId?: number;
+  exhibitorId?: number;
+  isChiefReviewer?: boolean;
+  expertise?: string[];
 }
 
 export interface AuthState {

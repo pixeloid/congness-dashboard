@@ -1,22 +1,27 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAbstractStore } from '@/store/abstractStore';
+import { useAbstractSubmissionStore } from '@/store/abstractSubmissionStore';
 import { useAuthStore } from '@/store/authStore';
 import ReviewList from '@/components/abstracts/ReviewList';
 import ReviewForm from '@/components/abstracts/ReviewForm';
+import ReviewDeadlineCountdown from '@/components/abstracts/ReviewDeadlineCountdown';
 import AbstractStatusBadge from '@/components/abstracts/AbstractStatusBadge';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
+import { InformationCircleIcon } from '@heroicons/react/16/solid';
+import clsx from 'clsx';
 
 const AbstractDetailsPage = () => {
-  const { abstractId } = useParams<{ abstractId: string }>();
+  const { abstractId, occasionId } = useParams<{ abstractId: string; occasionId: string }>();
   const navigate = useNavigate();
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
 
   const { user } = useAuthStore();
+  const { process } = useAbstractSubmissionStore();
   const {
     abstracts,
     reviews,
@@ -28,21 +33,52 @@ const AbstractDetailsPage = () => {
       makeDecision
     }
   } = useAbstractStore();
+  const { actions: submissionActions } = useAbstractSubmissionStore();
 
   const abstract = abstracts.find(a => a.id === Number(abstractId));
+  const userReview = reviews.find(r => r.reviewerId === user?.id);
+  const isReviewDeadlinePassed = process?.reviewDeadline && new Date(process.reviewDeadline) < new Date();
+
 
   useEffect(() => {
     if (abstractId) {
       fetchReviews(parseInt(abstractId, 10));
+      if (occasionId) {
+        submissionActions.fetchSubmissionProcess(parseInt(occasionId, 10));
+      }
     }
-  }, [abstractId, fetchReviews]);
+  }, [abstractId, occasionId, fetchReviews, submissionActions]);
+
+
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error} />;
   if (!abstract) return <ErrorMessage message="Abstract not found" />;
 
-  const canReview = user?.role === 'event_manager';
-  const canMakeDecision = user?.role === 'event_manager' && abstract.status === 'in_review';
+  const isReviewer = user?.role === 'scientific_reviewer' || user?.role === 'chief_reviewer';
+  const canReview = isReviewer &&
+    abstract.status === 'in_review' &&
+    !userReview &&
+    !isReviewDeadlinePassed;
+
+  const canMakeDecision = user?.role === 'chief_reviewer' &&
+    abstract.status === 'in_review' &&
+    reviews.length >= 2 &&
+    isReviewDeadlinePassed;
+
+  const handleReviewSubmit = async (data: any) => {
+    try {
+      await submitReview({
+        ...data,
+        abstractId: abstract.id,
+        reviewerId: user!.id,
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      });
+      setIsReviewFormOpen(false);
+    } catch (error) {
+      console.error('Failed to submit review:', error);
+    }
+  };
 
   return (
     <div className="p-6 space-y-8">
@@ -60,20 +96,42 @@ const AbstractDetailsPage = () => {
             <h1 className="text-3xl font-display font-bold text-white mb-2">
               {abstract.title}
             </h1>
-            <div className="flex items-center gap-4 text-white/70">
-              <AbstractStatusBadge status={abstract.status} />
+            <div className="flex items-center gap-4 text-sm text-white/70">
               <span>
-                Beküldve: {format(new Date(abstract.submittedAt!), 'PPP', { locale: hu })}
+                Submitted: {format(new Date(abstract.submittedAt || ''), 'PPP', { locale: hu })}
               </span>
+              {process?.reviewDeadline && (
+                <ReviewDeadlineCountdown deadline={process.reviewDeadline} />
+              )}
+              <AbstractStatusBadge status={abstract.status} />
             </div>
           </div>
+          {isReviewer && !isReviewFormOpen && (
+            <button
+              onClick={() => setIsReviewFormOpen(true)}
+              className={clsx(
+                "inline-flex items-center px-4 py-2 rounded-lg transition-colors",
+                canReview
+                  ? "bg-accent text-navy-dark hover:bg-accent-light"
+                  : "bg-navy/50 text-white/50 cursor-not-allowed"
+              )}
+              disabled={!canReview}
+            >
+              <DocumentTextIcon className="h-5 w-5 mr-2" />
+              {userReview
+                ? "Már bírálva"
+                : isReviewDeadlinePassed
+                  ? "Bírálati határidő lejárt"
+                  : "Bírálat hozzáadása"}
+            </button>
+          )}
         </div>
 
-        <div className="prose prose-invert max-w-none mb-6">
-          <div dangerouslySetInnerHTML={{ __html: abstract.description }} />
+        <div className="prose prose-invert max-w-none">
+          <p>{abstract.description}</p>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="mt-6 flex flex-wrap gap-2">
           {abstract.keywords.map((keyword) => (
             <span
               key={keyword}
@@ -83,59 +141,28 @@ const AbstractDetailsPage = () => {
             </span>
           ))}
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {abstract.authors.map((author) => (
-            <div
-              key={author.id}
-              className="p-4 bg-navy/30 rounded-lg border border-white/10"
-            >
-              <p className="text-white font-medium">{author.name}</p>
-              <p className="text-white/70 text-sm">{author.email}</p>
-              <p className="text-white/70 text-sm">{author.affiliation}</p>
-              {author.isPresenting && (
-                <span className="mt-2 inline-block px-2 py-1 text-xs bg-accent/10 text-accent rounded-full">
-                  Presenting Author
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
       </div>
+
+      {/* ... rest of the component remains the same until the reviews section ... */}
 
       <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-display font-semibold text-white">
-            Reviews
+            Bírálatok
           </h2>
-          {canReview && !isReviewFormOpen && (
-            <button
-              onClick={() => setIsReviewFormOpen(true)}
-              className="px-4 py-2 bg-accent text-navy-dark rounded-lg"
-            >
-              Add Review
-            </button>
-          )}
         </div>
 
         {isReviewFormOpen ? (
           <div className="mb-6">
             <ReviewForm
-              onSubmit={(data) => {
-                submitReview({
-                  ...data,
-                  abstractId: abstract.id,
-                  reviewerId: user!.id,
-                  deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-                });
-                setIsReviewFormOpen(false);
-              }}
+              onSubmit={handleReviewSubmit}
             />
           </div>
         ) : null}
 
         <ReviewList
           reviews={reviews}
+          currentUserId={user?.id}
           onSelect={() => {/* TODO: Implement review details/edit */ }}
         />
       </div>
@@ -143,27 +170,36 @@ const AbstractDetailsPage = () => {
       {canMakeDecision && (
         <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6">
           <h2 className="text-2xl font-display font-semibold text-white mb-6">
-            Final Decision
+            Végső döntés (Bírálati időszak lezárult)
           </h2>
           <div className="flex gap-4">
             <button
               onClick={() => makeDecision(abstract.id, 'accept', 'oral')}
               className="px-4 py-2 bg-green-500 text-white rounded-lg"
             >
-              Accept as Oral
+              Elfogadás szóbeli előadásként
             </button>
             <button
               onClick={() => makeDecision(abstract.id, 'accept', 'poster')}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg"
             >
-              Accept as Poster
+              Elfogadás poszterként
             </button>
             <button
               onClick={() => makeDecision(abstract.id, 'reject')}
               className="px-4 py-2 bg-red-500 text-white rounded-lg"
             >
-              Reject
+              Elutasítás
             </button>
+          </div>
+        </div>
+      )}
+
+      {user?.role === 'chief_reviewer' && !isReviewDeadlinePassed && (
+        <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6">
+          <div className="flex items-center gap-4 text-white/70">
+            <InformationCircleIcon className="h-5 w-5" />
+            <p>Végső döntések csak a bírálati határidő lejárta után hozhatók.</p>
           </div>
         </div>
       )}

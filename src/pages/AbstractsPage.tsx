@@ -1,15 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAbstractStore } from '@/store/abstractStore';
 import { useAbstractSubmissionStore } from '@/store/abstractSubmissionStore';
 import AbstractList from '@/components/abstracts/AbstractList';
+import AbstractFilters from '@/components/abstracts/AbstractFilters';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { Abstract, AbstractStatus } from '@/types/abstract';
 
 const AbstractsPage = () => {
   const { occasionId } = useParams<{ occasionId: string }>();
   const navigate = useNavigate();
+
+  const [filters, setFilters] = useState<{
+    search?: string;
+    status?: AbstractStatus;
+    presentationType?: 'oral' | 'poster';
+  }>({});
 
   const {
     abstracts,
@@ -21,16 +29,36 @@ const AbstractsPage = () => {
   const {
     isLoading: invitationsLoading,
     error: invitationsError,
-    actions: { fetchInvitations }
+    actions: { fetchInvitations, fetchSubmissionProcess }
   } = useAbstractSubmissionStore();
 
   useEffect(() => {
     if (occasionId) {
       const id = parseInt(occasionId, 10);
+      fetchSubmissionProcess(id);
       fetchAbstracts(id);
       fetchInvitations(id);
     }
-  }, [occasionId, fetchAbstracts, fetchInvitations]);
+  }, [occasionId, fetchAbstracts, fetchInvitations, fetchSubmissionProcess]);
+
+  const filteredAbstracts = abstracts.filter(abstract => {
+    if (filters.status && abstract.status !== filters.status) return false;
+    if (filters.presentationType && abstract.presentationType !== filters.presentationType) return false;
+    if (filters.search) {
+      const search = filters.search.toLowerCase();
+      return (
+        abstract.title.toLowerCase().includes(search) ||
+        abstract.authors.some(author =>
+          author.name.toLowerCase().includes(search) ||
+          author.email.toLowerCase().includes(search)
+        ) ||
+        abstract.keywords.some(keyword =>
+          keyword.toLowerCase().includes(search)
+        )
+      );
+    }
+    return true;
+  });
 
   if (abstractsLoading || invitationsLoading) return <LoadingSpinner />;
   if (abstractsError) return <ErrorMessage message={abstractsError} />;
@@ -52,8 +80,24 @@ const AbstractsPage = () => {
         </button>
       </div>
 
+      <AbstractFilters filters={filters} onFilterChange={setFilters} />
+
+      <div className="mb-4 grid grid-cols-4 gap-4">
+        {[
+          { label: 'Total', value: abstracts.length },
+          { label: 'Submitted', value: abstracts.filter(a => a.status === 'submitted').length },
+          { label: 'In Review', value: abstracts.filter(a => a.status === 'in_review').length },
+          { label: 'Accepted', value: abstracts.filter(a => a.status === 'accepted').length }
+        ].map(stat => (
+          <div key={stat.label} className="bg-navy/30 backdrop-blur-md rounded-lg border border-white/10 p-4">
+            <p className="text-white/70 text-sm">{stat.label}</p>
+            <p className="text-2xl font-display font-bold text-white">{stat.value}</p>
+          </div>
+        ))}
+      </div>
+
       <AbstractList
-        abstracts={abstracts}
+        abstracts={filteredAbstracts}
         onSelect={(abstract) => {
           navigate(`/occasions/${occasionId}/abstracts/${abstract.id}`);
         }}

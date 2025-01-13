@@ -22,9 +22,11 @@ export interface AbstractSubmissionProcess {
   id: number;
   occasionId: number;
   isPublic: boolean;
+  submissionDeadline: string;
   startDate: string;
   endDate: string;
   maxAbstracts: number;
+  reviewDeadline: string;
   categories: AbstractCategory[];
   guidelines: string;
 }

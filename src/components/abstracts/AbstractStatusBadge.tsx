@@ -15,11 +15,11 @@ const statusStyles = {
 };
 
 const statusLabels = {
-  draft: 'Draft',
-  submitted: 'Submitted',
-  in_review: 'In Review',
-  accepted: 'Accepted',
-  rejected: 'Rejected'
+  draft: 'Vázlat',
+  submitted: 'Beadva',
+  in_review: 'Bírálat alatt',
+  accepted: 'Elfogadva',
+  rejected: 'Elutasítva'
 };
 
 const AbstractStatusBadge: React.FC<AbstractStatusBadgeProps> = ({ status }) => {

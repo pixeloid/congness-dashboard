@@ -27,17 +27,21 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        <Route path="/invitation/:token" element={<InvitationResponsePage />} />
-        <Route path="/submission-success" element={<SubmissionSuccessPage />} />
-        
+        <Route path="/abstracts/invitation/:token" element={<InvitationResponsePage />} />
+        <Route path="/abstracts/submission-success" element={<SubmissionSuccessPage />} />
+        <Route path="/abstracts/submit" element={<PublicAbstractSubmissionPage />} />
+
+        {/* Protected routes */}
         <Route path="/select-occasion" element={
           <AuthGuard>
             <OccasionSelectionPage />
           </AuthGuard>
         } />
 
+        {/* Dashboard layout routes */}
         <Route path="/occasions/:occasionId" element={
           <AuthGuard>
             <DashboardLayout />
@@ -56,28 +60,27 @@ const App = () => {
             </AuthGuard>
           } />
           <Route path="abstracts" element={
-            <AuthGuard allowedRoles={['event_manager']}>
+            <AuthGuard allowedRoles={['event_manager', 'scientific_reviewer', 'chief_reviewer']}>
               <AbstractsPage />
             </AuthGuard>
           } />
           <Route path="abstracts/new" element={
-            <AuthGuard allowedRoles={['event_manager']}>
+            <AuthGuard allowedRoles={['event_manager', 'scientific_reviewer', 'chief_reviewer']}>
               <AbstractSubmissionPage />
             </AuthGuard>
           } />
-          <Route path="abstracts/submit" element={<PublicAbstractSubmissionPage />} />
           <Route path="abstracts/settings" element={
             <AuthGuard allowedRoles={['event_manager']}>
               <AbstractSubmissionSettingsPage />
             </AuthGuard>
           } />
           <Route path="abstracts/:abstractId" element={
-            <AuthGuard allowedRoles={['event_manager']}>
+            <AuthGuard allowedRoles={['event_manager', 'scientific_reviewer', 'chief_reviewer']}>
               <AbstractDetailsPage />
             </AuthGuard>
           } />
           <Route path="abstracts/:abstractId/review" element={
-            <AuthGuard allowedRoles={['event_manager']}>
+            <AuthGuard allowedRoles={['event_manager', 'scientific_reviewer', 'chief_reviewer']}>
               <AbstractReviewPage />
             </AuthGuard>
           } />
@@ -103,6 +106,7 @@ const App = () => {
           } />
         </Route>
 
+        {/* Default redirect */}
         <Route path="/" element={<Navigate to="/select-occasion" replace />} />
       </Routes>
     </BrowserRouter>

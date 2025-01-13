@@ -6,8 +6,8 @@ interface AuthStore extends AuthState {
   actions: {
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
-    updateUser: (updates: Partial<User>) => void;
     checkAuth: () => Promise<void>;
+    updateUser: (updates: Partial<User>) => void;
   };
 }
 
@@ -21,24 +21,24 @@ const mockUsers: User[] = [
   },
   {
     id: 2,
-    name: "Kiss Éva",
-    email: "kiss.eva@example.com",
-    role: "exhibitor",
-    exhibitorId: 1
+    name: "Dr. Kovács Péter",
+    email: "kovacs.peter@example.com",
+    role: "chief_reviewer",
+    expertise: ["Medical Imaging", "AI in Healthcare"]
   },
   {
     id: 3,
-    name: "Kovács Péter",
-    email: "kovacs.peter@example.com",
-    role: "exhibition_staff",
-    exhibitionId: 1
+    name: "Dr. Szabó Anna",
+    email: "szabo.anna@example.com",
+    role: "scientific_reviewer",
+    expertise: ["Clinical Research", "Neurology"]
   },
   {
     id: 4,
-    name: "Szabó Anna",
-    email: "szabo.anna@example.com",
-    role: "participant",
-    participantId: 1
+    name: "Dr. Kiss Márta",
+    email: "kiss.marta@example.com",
+    role: "scientific_reviewer",
+    expertise: ["Cardiology", "Medical Technology"]
   }
 ];
 
@@ -52,7 +52,6 @@ export const useAuthStore = create<AuthStore>()(
       login: async (email: string, _password: string) => {
         set({ isLoading: true, error: null });
         try {
-          // Simulate API call
           await new Promise(resolve => setTimeout(resolve, 1000));
 
           const user = mockUsers.find(u => u.email === email);
@@ -81,34 +80,26 @@ export const useAuthStore = create<AuthStore>()(
         });
       },
 
+      checkAuth: async () => {
+        set({ isLoading: true });
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          // In a real app, this would check with the backend
+          set({ isLoading: false });
+        } catch (error) {
+          set({
+            error: 'Authentication check failed',
+            isLoading: false
+          });
+        }
+      },
+
       updateUser: (updates) => {
         set((state) => {
           if (state.user) {
             state.user = { ...state.user, ...updates };
           }
         });
-      },
-
-      checkAuth: async () => {
-        set({ isLoading: true, error: null });
-        try {
-          // Simulate API call to check session
-          await new Promise(resolve => setTimeout(resolve, 500));
-
-          // For development, auto-login as event manager
-          set({
-            user: mockUsers[0],
-            isAuthenticated: true,
-            isLoading: false
-          });
-        } catch (error) {
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: 'Session expired'
-          });
-        }
       }
     }
   }))
