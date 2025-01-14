@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
-import { 
-  DndContext, 
+import {
+  DndContext,
   DragOverlay,
-  useSensor, 
+  PointerSensor,
+  useSensor,
   useSensors,
   TouchSensor,
   KeyboardSensor,
   closestCorners,
-  PointerSensor
+  defaultDropAnimation
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import DaySection from './DaySection';
@@ -45,7 +46,7 @@ const ScheduleEditor = () => {
     presentations,
     templates
   });
-  
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -87,18 +88,18 @@ const ScheduleEditor = () => {
           <h2 className="text-2xl font-display font-bold text-white">Conference Schedule</h2>
           <AddDayButton onAdd={actions.addDay} />
         </div>
-        
+
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <PresentationPool 
+          <PresentationPool
             templates={templates}
             presentations={presentations}
           />
-          
+
           <div className="space-y-8">
             {schedule.days.map((day) => (
               <DaySection
@@ -112,7 +113,7 @@ const ScheduleEditor = () => {
 
           <DragOverlay>
             {activeId && activeItem && (
-              <div className="transform scale-105 opacity-85">
+              <div className="transform scale-105 opacity-85 cursor-grabbing">
                 <ScheduleItem item={activeItem} />
               </div>
             )}

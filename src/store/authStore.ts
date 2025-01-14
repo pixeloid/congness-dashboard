@@ -1,12 +1,23 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { AuthState, User } from '@/types/auth';
+import { persist } from 'zustand/middleware';
+import { AuthState, User, UserRole } from '@/types/auth';
 
-interface AuthStore extends AuthState {
+export enum AuthStatus {
+  LOADING = 'loading',
+  AUTHENTICATED = 'authenticated',
+  UNAUTHENTICATED = 'unauthenticated'
+}
+
+interface AuthStore {
+  user: User | null;
+  token: string | null;
+  authStatus: AuthStatus;
+  error: string | null;
   actions: {
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
-    checkAuth: () => Promise<void>;
+    checkAuth: () => Promise<boolean>;
     updateUser: (updates: Partial<User>) => void;
   };
 }
@@ -17,90 +28,216 @@ const mockUsers: User[] = [
     id: 1,
     name: "Nagy János",
     email: "nagy.janos@example.com",
-    role: "event_manager"
+    occasionRoles: [
+      {
+        occasionId: 1,
+        roles: [{
+          role: UserRole.EVENT_MANAGER
+        }]
+      },
+      {
+        occasionId: 2,
+        roles: [{ role: UserRole.PARTICIPANT }]
+      }
+    ]
   },
   {
     id: 2,
     name: "Dr. Kovács Péter",
     email: "kovacs.peter@example.com",
-    role: "chief_reviewer",
-    expertise: ["Medical Imaging", "AI in Healthcare"]
+    occasionRoles: [
+      {
+        occasionId: 1,
+        roles: [{
+          role: UserRole.CHIEF_REVIEWER,
+          capabilities: {
+            canReview: {
+              expertise: ["Medical Imaging", "AI in Healthcare"],
+              isChief: true
+            }
+          }
+        }]
+      },
+      {
+        occasionId: 2,
+        roles: [{
+          role: UserRole.SCIENTIFIC_REVIEWER,
+          capabilities: {
+            canReview: {
+              expertise: ["Medical Imaging"]
+            }
+          }
+        }]
+      }
+    ]
   },
   {
     id: 3,
     name: "Dr. Szabó Anna",
     email: "szabo.anna@example.com",
-    role: "scientific_reviewer",
-    expertise: ["Clinical Research", "Neurology"]
+    occasionRoles: [
+      {
+        occasionId: 1,
+        roles: [{
+          role: UserRole.SCIENTIFIC_REVIEWER,
+          capabilities: {
+            canReview: {
+              expertise: ["Clinical Research", "Neurology"]
+            }
+          }
+        }]
+      }
+    ]
   },
   {
     id: 4,
     name: "Dr. Kiss Márta",
     email: "kiss.marta@example.com",
-    role: "scientific_reviewer",
-    expertise: ["Cardiology", "Medical Technology"]
+    occasionRoles: [
+      {
+        occasionId: 1,
+        roles: [
+          {
+            role: UserRole.SCIENTIFIC_REVIEWER,
+            capabilities: {
+              canReview: {
+                expertise: ["Cardiology", "Medical Technology"]
+              }
+            }
+          },
+          {
+            role: UserRole.PARTICIPANT,
+            capabilities: {
+              participantId: 123
+            }
+          }
+        ]
+      }
+    ]
   }
 ];
 
 export const useAuthStore = create<AuthStore>()(
-  immer((set) => ({
-    user: null,
-    isAuthenticated: false,
-    isLoading: false,
-    error: null,
-    actions: {
-      login: async (email: string, _password: string) => {
-        set({ isLoading: true, error: null });
-        try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+  persist(
+    immer((set, get) => ({
+      user: null,
+      token: null,
+      authStatus: AuthStatus.LOADING,
+      error: null,
+      actions: {
+        login: async (email: string, _password: string) => {
+          set({ authStatus: AuthStatus.LOADING, error: null });
+          try {
+            // Find user immediately for quick login
+            const user = mockUsers.find(u => u.email === email);
+            if (!user) {
+              throw new Error('Invalid credentials');
+            }
 
-          const user = mockUsers.find(u => u.email === email);
-          if (!user) {
-            throw new Error('Invalid credentials');
+            // Simulate minimal delay for UI feedback
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            // Generate mock token (in real app this would come from backend)
+            const token = btoa(JSON.stringify({
+              userId: user.id,
+              email: user.email,
+              exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+            }));
+
+            set({
+              user,
+              token,
+              authStatus: AuthStatus.AUTHENTICATED
+            });
+          } catch (error) {
+            set({
+              error: error instanceof Error ? error.message : 'Login failed',
+              authStatus: AuthStatus.UNAUTHENTICATED
+            });
           }
+        },
 
+        logout: () => {
           set({
-            user,
-            isAuthenticated: true,
-            isLoading: false
+            user: null,
+            token: null,
+            authStatus: AuthStatus.UNAUTHENTICATED,
+            error: null
           });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : 'Login failed',
-            isLoading: false
+        },
+
+        checkAuth: async () => {
+          const state = get();
+
+          set({ authStatus: AuthStatus.LOADING, error: null });
+
+          try {
+            if (!state.token) {
+              set({
+                authStatus: AuthStatus.UNAUTHENTICATED,
+                user: null,
+                error: null
+              });
+              return false;
+            }
+
+            // Decode and validate token
+            const tokenData = JSON.parse(atob(state.token));
+
+            // Check if token is expired
+            if (tokenData.exp < Date.now()) {
+              set({
+                user: null,
+                token: null,
+                authStatus: AuthStatus.UNAUTHENTICATED,
+                error: 'Session expired'
+              });
+              return false;
+            }
+
+            // Find user from token
+            const user = mockUsers.find(u => u.id === tokenData.userId);
+            if (!user) {
+              set({
+                user: null,
+                token: null,
+                authStatus: AuthStatus.UNAUTHENTICATED,
+                error: 'User not found'
+              });
+              return false;
+            }
+
+            set({
+              user,
+              authStatus: AuthStatus.AUTHENTICATED,
+              error: null
+            });
+
+            return true;
+          } catch (error) {
+            set({
+              user: null,
+              token: null,
+              authStatus: AuthStatus.UNAUTHENTICATED,
+              error: error instanceof Error ? error.message : 'Authentication check failed'
+            });
+            return false;
+          }
+        },
+
+        updateUser: (updates) => {
+          set((state) => {
+            if (state.user) {
+              state.user = { ...state.user, ...updates };
+            }
           });
         }
-      },
-
-      logout: () => {
-        set({
-          user: null,
-          isAuthenticated: false,
-          error: null
-        });
-      },
-
-      checkAuth: async () => {
-        set({ isLoading: true });
-        try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          // In a real app, this would check with the backend
-          set({ isLoading: false });
-        } catch (error) {
-          set({
-            error: 'Authentication check failed',
-            isLoading: false
-          });
-        }
-      },
-
-      updateUser: (updates) => {
-        set((state) => {
-          if (state.user) {
-            state.user = { ...state.user, ...updates };
-          }
-        });
       }
-    }
-  }))
+    })), {
+    name: 'auth-storage',
+    partialize: (state) => ({
+      token: state.token,
+      user: state.user
+    })
+  })
 );

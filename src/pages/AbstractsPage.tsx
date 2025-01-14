@@ -27,19 +27,20 @@ const AbstractsPage = () => {
   } = useAbstractStore();
 
   const {
+    process,
     isLoading: invitationsLoading,
     error: invitationsError,
-    actions: { fetchInvitations, fetchSubmissionProcess }
+    actions
   } = useAbstractSubmissionStore();
 
   useEffect(() => {
     if (occasionId) {
       const id = parseInt(occasionId, 10);
-      fetchSubmissionProcess(id);
+      actions.fetchSubmissionProcess(id);
       fetchAbstracts(id);
-      fetchInvitations(id);
+      actions.fetchInvitations(id);
     }
-  }, [occasionId, fetchAbstracts, fetchInvitations, fetchSubmissionProcess]);
+  }, [occasionId, actions, fetchAbstracts]);
 
   const filteredAbstracts = abstracts.filter(abstract => {
     if (filters.status && abstract.status !== filters.status) return false;

@@ -1,36 +1,38 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { Schedule, Day, Track, Section, ScheduleItem } from '@/types/schedule';
+import { Schedule, Day, Track, Section, ScheduleItem, ScheduleItemType } from '@/types/schedule';
+import { Abstract } from '@/types/abstract';
 import { v4 as uuidv4 } from 'uuid';
 import { addDays } from 'date-fns';
 
 interface ScheduleState {
   schedule: Schedule | null;
   templates: ScheduleItem[];
-  presentations: ScheduleItem[];
+  presentations: ScheduleItem[]; // Derived from abstracts
   isLoading: boolean;
   error: string | null;
   actions: {
     // Schedule actions
     initializeSchedule: (occasionId: number) => void;
     fetchSchedule: (occasionId: number) => Promise<void>;
+    initializeFromAbstracts: (abstracts: Abstract[]) => void;
     saveSchedule: () => Promise<void>;
-    
+
     // Day actions
     addDay: () => void;
     removeDay: (dayId: string) => void;
     updateDay: (dayId: string, updates: Partial<Day>) => void;
-    
+
     // Track actions
     addTrack: (dayId: string) => void;
     removeTrack: (dayId: string, trackId: string) => void;
     updateTrack: (dayId: string, trackId: string, updates: Partial<Track>) => void;
-    
+
     // Section actions
     addSection: (dayId: string, trackId: string) => void;
     removeSection: (dayId: string, trackId: string, sectionId: string) => void;
     updateSection: (dayId: string, trackId: string, sectionId: string, updates: Partial<Section>) => void;
-    
+
     // Item actions
     addItem: (dayId: string, trackId: string, sectionId: string | null, item: ScheduleItem) => void;
     removeItem: (dayId: string, trackId: string, sectionId: string | null, itemId: string) => void;
@@ -71,7 +73,8 @@ export const useScheduleStore = create<ScheduleState>()(
         title: 'Kávészünet',
         duration: 30,
         type: 'coffee',
-        isTemplate: true
+        isTemplate: true,
+        items: []
       }
     ],
     presentations: [],
@@ -115,6 +118,65 @@ export const useScheduleStore = create<ScheduleState>()(
         } catch (error) {
           set({ error: 'Failed to fetch schedule', isLoading: false });
         }
+      },
+
+      initializeFromAbstracts: (abstracts) => {
+        set(state => {
+          // Convert accepted abstracts to schedule items
+          const presentationItems = abstracts
+            .filter(abstract => abstract.status === 'accepted')
+            .map(abstract => ({
+              id: uuidv4(),
+              title: abstract.title,
+              description: abstract.description,
+              duration: abstract.presentationType === 'oral' ? 20 : 10, // Default durations
+              type: 'session' as ScheduleItemType,
+              abstractId: abstract.id,
+              authors: abstract.authors.map(a => a.name).join(', '),
+              presentationType: abstract.presentationType
+            }));
+
+          state.presentations = presentationItems;
+
+          // If no schedule exists, create initial schedule with sections
+          if (!state.schedule) {
+            const startDate = new Date();
+            startDate.setHours(9, 0, 0, 0);
+
+            // Create sections for oral and poster presentations
+            const oralSection: Section = {
+              id: uuidv4(),
+              title: 'Szóbeli előadások',
+              type: 'session',
+              duration: 0,
+              items: presentationItems.filter(p => p.presentationType === 'oral')
+            };
+
+            const posterSection: Section = {
+              id: uuidv4(),
+              title: 'Poszter szekció',
+              type: 'session',
+              duration: 0,
+              items: presentationItems.filter(p => p.presentationType === 'poster')
+            };
+
+            state.schedule = {
+              id: uuidv4(),
+              occasionId: abstracts[0]?.occasionId || 0,
+              days: [{
+                id: uuidv4(),
+                date: startDate,
+                startTime: startDate,
+                tracks: [{
+                  id: uuidv4(),
+                  title: 'Fő program',
+                  presentations: [],
+                  sections: [oralSection, posterSection]
+                }]
+              }]
+            };
+          }
+        });
       },
 
       saveSchedule: async () => {
@@ -264,7 +326,7 @@ export const useScheduleStore = create<ScheduleState>()(
           const track = day.tracks.find(t => t.id === trackId);
           if (!track) return;
 
-          const newItem = item.isTemplate 
+          const newItem = item.isTemplate
             ? { ...item, id: uuidv4(), isTemplate: false }
             : { ...item };
 

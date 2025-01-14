@@ -14,11 +14,19 @@ import {
   CogIcon,
   ChevronDownIcon
 } from '@heroicons/react/24/outline';
+import { UserRole } from '@/types/auth';
 import Logo from '@/components/common/Logo';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import { useOccasionsStore } from '@/store/occasionsStore';
 import { useAuthStore } from '@/store/authStore';
 import clsx from 'clsx';
+
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: any;
+  roles?: UserRole[];
+}
 
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,6 +38,20 @@ const DashboardLayout: React.FC = () => {
 
   // Find the current occasion with proper type checking
   const currentOccasion = occasionId ? occasions.find(o => o.id === parseInt(occasionId)) : null;
+
+  const hasRole = (roles?: UserRole[]): boolean => {
+    if (!roles || !user || !occasionId) return true;
+
+    const occasionRole = user.occasionRoles.find(
+      role => role.occasionId === parseInt(occasionId)
+    );
+
+    if (!occasionRole) return false;
+
+    return occasionRole.roles.some(userRole =>
+      roles.includes(userRole.role as UserRole)
+    );
+  };
 
   useEffect(() => {
     if (occasionId) {
@@ -43,18 +65,57 @@ const DashboardLayout: React.FC = () => {
     navigate('/select-occasion');
   };
 
-  const navigationItems = [
-    { name: 'Vezérlőpult', href: `dashboard`, icon: ChartBarIcon },
-    { name: 'Időbeosztás', href: `schedule`, icon: CalendarIcon },
-    { name: 'Résztvevők', href: `participants`, icon: UserGroupIcon },
-    { name: 'Ellenőrzőpontok', href: `checkpoints`, icon: MapPinIcon },
-    { name: 'Kiállítók', href: `exhibitions`, icon: BuildingStorefrontIcon },
+  const navigationItems: NavigationItem[] = [
+    {
+      name: 'Vezérlőpult',
+      href: `dashboard`,
+      icon: ChartBarIcon
+    },
+    {
+      name: 'Időbeosztás',
+      href: `schedule`,
+      icon: CalendarIcon,
+      roles: [UserRole.EVENT_MANAGER]
+    },
+    {
+      name: 'Résztvevők',
+      href: `participants`,
+      icon: UserGroupIcon,
+      roles: [UserRole.EVENT_MANAGER]
+    },
+    {
+      name: 'Ellenőrzőpontok',
+      href: `checkpoints`,
+      icon: MapPinIcon,
+      roles: [UserRole.EVENT_MANAGER]
+    },
+    {
+      name: 'Kiállítók',
+      href: `exhibitions`,
+      icon: BuildingStorefrontIcon,
+      roles: [UserRole.EVENT_MANAGER, UserRole.EXHIBITOR]
+    }
   ];
 
-  const abstractItems = [
-    { name: 'Összefoglalók', href: 'abstracts', icon: DocumentTextIcon },
-    { name: 'Összefoglaló feltöltése', href: 'abstracts/submit?token=pending-token', icon: DocumentTextIcon },
-    { name: 'Összefoglaló beállítások', href: 'abstracts/settings', icon: CogIcon },
+  const abstractItems: NavigationItem[] = [
+    {
+      name: 'Összefoglalók',
+      href: 'abstracts',
+      icon: DocumentTextIcon,
+      roles: [UserRole.EVENT_MANAGER, UserRole.SCIENTIFIC_REVIEWER, UserRole.CHIEF_REVIEWER]
+    },
+    {
+      name: 'Összefoglaló feltöltése',
+      href: 'abstracts/submit?token=pending-token',
+      icon: DocumentTextIcon,
+      roles: [UserRole.EVENT_MANAGER, UserRole.SCIENTIFIC_REVIEWER, UserRole.CHIEF_REVIEWER]
+    },
+    {
+      name: 'Összefoglaló beállítások',
+      href: 'abstracts/settings',
+      icon: CogIcon,
+      roles: [UserRole.EVENT_MANAGER]
+    }
   ];
 
   return (
@@ -115,6 +176,8 @@ const DashboardLayout: React.FC = () => {
           {/* Navigation */}
           <nav className="flex-1 px-4 pt-4 space-y-1 overflow-y-auto">
             {navigationItems.map((item) => {
+              if (!hasRole(item.roles)) return null;
+
               const href = currentOccasion ? `/occasions/${currentOccasion.id}/${item.href}` : '#';
               return (
                 <Link
@@ -130,25 +193,26 @@ const DashboardLayout: React.FC = () => {
 
             {/* Abstracts Dropdown */}
             <div>
-              <button
-                onClick={() => setAbstractsOpen(!abstractsOpen)}
-                className="w-full flex items-center justify-between px-3 py-2 text-sm text-foreground-light/70 dark:text-foreground-dark/70 rounded-lg hover:bg-white/10 hover:text-accent transition-colors"
-              >
-                <div className="flex items-center">
-                  <DocumentTextIcon className="h-5 w-5 mr-3" />
-                  <span>Absztraktok</span>
-                </div>
-                <ChevronDownIcon
-                  className={clsx(
-                    "h-4 w-4 transition-transform duration-200",
-                    abstractsOpen ? "transform rotate-180" : ""
-                  )}
-                />
-              </button>
-
+              {hasRole([UserRole.EVENT_MANAGER, UserRole.SCIENTIFIC_REVIEWER, UserRole.CHIEF_REVIEWER]) && (
+                <button
+                  onClick={() => setAbstractsOpen(!abstractsOpen)}
+                  className="w-full flex items-center justify-between px-3 py-2 text-sm text-foreground-light/70 dark:text-foreground-dark/70 rounded-lg hover:bg-white/10 hover:text-accent transition-colors"
+                >
+                  <div className="flex items-center">
+                    <DocumentTextIcon className="h-5 w-5 mr-3" />
+                    <span>Absztraktok</span>
+                  </div>
+                  <ChevronDownIcon
+                    className={clsx(
+                      "h-4 w-4 transition-transform duration-200",
+                      abstractsOpen ? "transform rotate-180" : ""
+                    )}
+                  />
+                </button>
+              )}
               {abstractsOpen && (
                 <div className="ml-4 mt-1 space-y-1">
-                  {abstractItems.map((item) => {
+                  {abstractItems.filter(item => hasRole(item.roles)).map((item) => {
                     const href = currentOccasion ? `/occasions/${currentOccasion.id}/${item.href}` : '#';
                     return (
                       <Link

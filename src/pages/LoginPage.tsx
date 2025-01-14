@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Logo from '@/components/common/Logo';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore, AuthStatus } from '@/store/authStore';
 
 
 const quickLoginUsers = [
@@ -33,13 +33,22 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const { isLoading, error, actions } = useAuthStore();
+  const { authStatus, error, actions } = useAuthStore();
+  const isLoading = authStatus === AuthStatus.LOADING;
+
+  // Don't show loading state during initial auth check
+  const showLoadingButton = isLoading && email.length > 0;
+
+  // Redirect if already authenticated
+  if (authStatus === AuthStatus.AUTHENTICATED) {
+    return <Navigate to="/select-occasion" replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await actions.login(email, password);
-      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      const from = (location.state as any)?.from?.pathname || '/select-occasion';
       navigate(from, { replace: true });
     } catch (error) {
       // Error is handled by the store
@@ -49,8 +58,6 @@ const LoginPage = () => {
   const handleQuickLogin = async (email: string) => {
     try {
       await actions.login(email, 'pass');
-      const from = (location.state as any)?.from?.pathname || '/dashboard';
-      navigate(from, { replace: true });
     } catch (error) {
       // Error is handled by the store
     }
@@ -111,7 +118,7 @@ const LoginPage = () => {
               disabled={isLoading}
               className="w-full px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {showLoadingButton ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
         </div>
@@ -133,7 +140,7 @@ const LoginPage = () => {
                 key={user.email}
                 onClick={() => handleQuickLogin(user.email)}
                 disabled={isLoading}
-                className="p-4 bg-navy/30 border border-white/10 rounded-lg text-left hover:border-accent/30 transition-all group"
+                className="p-4 bg-navy/30 border border-white/10 rounded-lg text-left hover:border-accent/30 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <h4 className="text-white font-medium group-hover:text-accent">
                   {user.name}
