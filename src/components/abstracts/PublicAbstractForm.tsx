@@ -1,22 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Author } from '@/types/abstract';
 
-const PublicAbstractForm = ({ onSubmit }) => {
+interface PublicAbstractFormProps {
+  onSubmit: (data: {
+    title: string;
+    authors: Author[];
+    keywords: string[];
+    content: string;
+  }) => void;
+}
+
+const PublicAbstractForm: React.FC<PublicAbstractFormProps> = ({ onSubmit }) => {
   const [title, setTitle] = useState('');
-  const [authors, setAuthors] = useState([{ name: '', email: '', affiliation: '', isPresenting: false }]);
-  const [keywords, setKeywords] = useState([]);
+  const [authors, setAuthors] = useState<Author[]>([
+    { id: 1, name: '', email: '', affiliation: '', isPresenting: false }
+  ]);
+  const [keywords, setKeywords] = useState<string[]>([]);
   const [newKeyword, setNewKeyword] = useState('');
   const [content, setContent] = useState('');
 
   const addAuthor = () => {
-    setAuthors([...authors, { name: '', email: '', affiliation: '', isPresenting: false }]);
+    setAuthors([...authors, {
+      id: authors.length + 1,
+      name: '',
+      email: '',
+      affiliation: '',
+      isPresenting: false
+    }]);
   };
 
-  const removeAuthor = (index) => {
+  const removeAuthor = (index: number) => {
     setAuthors(authors.filter((_, i) => i !== index));
   };
 
-  const updateAuthor = (index, field, value) => {
+  const updateAuthor = (index: number, field: keyof Author, value: string | boolean) => {
     const newAuthors = [...authors];
     newAuthors[index] = { ...newAuthors[index], [field]: value };
     setAuthors(newAuthors);
@@ -29,11 +47,11 @@ const PublicAbstractForm = ({ onSubmit }) => {
     }
   };
 
-  const removeKeyword = (keyword) => {
+  const removeKeyword = (keyword: string) => {
     setKeywords(keywords.filter(k => k !== keyword));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     onSubmit({
       title,
@@ -72,7 +90,7 @@ const PublicAbstractForm = ({ onSubmit }) => {
             Add Author
           </button>
         </div>
-        
+
         <div className="space-y-4">
           {authors.map((author, index) => (
             <div key={index} className="p-4 bg-gray-50 rounded-lg">
@@ -88,7 +106,7 @@ const PublicAbstractForm = ({ onSubmit }) => {
                   </button>
                 )}
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <input
                   type="text"

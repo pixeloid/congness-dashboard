@@ -30,7 +30,9 @@ const ProfilePage = () => {
           </div>
           <div>
             <h2 className="text-xl font-display font-semibold text-white">{user?.name}</h2>
-            <p className="text-white/70">{user?.role}</p>
+            <p className="text-white/70">
+              {user?.occasionRoles.map(role => role.roles.map(r => r.role).join(', ')).join(' | ')}
+            </p>
           </div>
         </div>
 
@@ -67,9 +69,20 @@ const ProfilePage = () => {
             <label className="block text-sm font-medium text-white/70 mb-1">
               Szerepkör
             </label>
-            <p className="px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white">
-              {user?.role}
-            </p>
+            <div className="space-y-2">
+              {user?.occasionRoles.map((occasionRole) => (
+                <div key={occasionRole.occasionId} className="px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white">
+                  <p className="text-sm text-white/70">Occasion {occasionRole.occasionId}</p>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {occasionRole.roles.map((role, index) => (
+                      <span key={index} className="px-2 py-1 text-sm bg-accent/10 text-accent rounded-full">
+                        {role.role}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">

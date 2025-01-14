@@ -34,11 +34,11 @@ export const useDragHandlers = ({
 
     for (const day of schedule.days) {
       for (const track of day.tracks) {
-        const trackItem = track.presentations.find(p => p.id === id);
+        const trackItem: ScheduleItem | undefined = track.presentations.find((p: ScheduleItem) => p.id === id);
         if (trackItem) return trackItem;
 
         for (const section of track.sections) {
-          const sectionItem = section.items.find(p => p.id === id);
+          const sectionItem: ScheduleItem | undefined = section.items.find((p: ScheduleItem) => p.id === id);
           if (sectionItem) return sectionItem;
         }
       }

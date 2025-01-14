@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { persist } from 'zustand/middleware';
-import { AuthState, User, UserRole } from '@/types/auth';
+import { User, UserRole } from '@/types/auth';
 
 export enum AuthStatus {
   LOADING = 'loading',

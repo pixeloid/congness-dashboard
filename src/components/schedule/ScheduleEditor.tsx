@@ -8,7 +8,6 @@ import {
   TouchSensor,
   KeyboardSensor,
   closestCorners,
-  defaultDropAnimation
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import DaySection from './DaySection';

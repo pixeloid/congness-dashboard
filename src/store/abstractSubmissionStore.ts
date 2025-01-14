@@ -132,7 +132,7 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
         }
       },
 
-      fetchCategories: async (occasionId) => {
+      fetchCategories: async () => {
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));

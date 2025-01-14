@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { addDays } from 'date-fns';
-import { Day, ScheduleItem, Schedule } from '@/types/schedule';
+import { ScheduleItem, Schedule } from '@/types/schedule';
 
 export const useScheduleState = (occasionId: number) => {
   const [templates] = useState<ScheduleItem[]>([

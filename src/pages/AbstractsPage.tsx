@@ -7,7 +7,7 @@ import AbstractFilters from '@/components/abstracts/AbstractFilters';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { Abstract, AbstractStatus } from '@/types/abstract';
+import { AbstractStatus } from '@/types/abstract';
 
 const AbstractsPage = () => {
   const { occasionId } = useParams<{ occasionId: string }>();
@@ -27,7 +27,6 @@ const AbstractsPage = () => {
   } = useAbstractStore();
 
   const {
-    process,
     isLoading: invitationsLoading,
     error: invitationsError,
     actions

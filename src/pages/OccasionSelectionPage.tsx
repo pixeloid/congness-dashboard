@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOccasionsStore } from '@/store/occasionsStore';
 import { format } from 'date-fns';
@@ -18,7 +17,7 @@ const OccasionSelectionPage = () => {
     <div className="min-h-screen bg-background-dark p-8">
       <div className="max-w-6xl mx-auto">
         <Logo className="h-12 w-auto mb-12" />
-        
+
         <h1 className="text-4xl font-display font-bold text-white mb-8">
           Válasszon eseményt
         </h1>
@@ -37,7 +36,7 @@ const OccasionSelectionPage = () => {
                 {occasion.subtitle}
               </p>
               <div className="text-sm text-white/50">
-                {format(new Date(occasion.startDate), 'yyyy. MMMM d.', { locale: hu })} - 
+                {format(new Date(occasion.startDate), 'yyyy. MMMM d.', { locale: hu })} -
                 {format(new Date(occasion.endDate), 'yyyy. MMMM d.', { locale: hu })}
               </div>
             </button>

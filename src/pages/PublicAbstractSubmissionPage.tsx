@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAbstractSubmissionStore } from '@/store/abstractSubmissionStore';
 import AbstractForm from '@/components/abstracts/AbstractForm';
@@ -84,9 +84,13 @@ const PublicAbstractSubmissionPage = () => {
           </div>
 
           <AbstractForm
-            onSubmit={async (data) => {
+            onSubmit={async () => {
               try {
-                await actions.handleInvitationResponse(token, true);
+                if (token) {
+                  await actions.handleInvitationResponse(token, true);
+                } else {
+                  console.error('Token is null');
+                }
                 navigate('/submission-success');
               } catch (error) {
                 console.error('Failed to submit abstract:', error);

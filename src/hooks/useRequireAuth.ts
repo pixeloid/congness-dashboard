@@ -1,29 +1,44 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore, AuthStatus } from '@/store/authStore';
 import { UserRole } from '@/types/auth';
 
 export const useRequireAuth = (requiredRoles?: UserRole[]) => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useAuthStore();
-  const checkAuth = useAuthStore(state => state.actions.checkAuth);
+  const { user, authStatus, actions } = useAuthStore();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      checkAuth();
-    }
-  }, [isAuthenticated, isLoading, checkAuth]);
+    const checkAuthentication = async () => {
+      setIsChecking(true);
+      await actions.checkAuth();
+      setIsChecking(false);
+    };
+
+    checkAuthentication();
+  }, [actions]);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isChecking && authStatus === AuthStatus.UNAUTHENTICATED) {
       navigate('/login');
       return;
     }
 
-    if (!isLoading && user && requiredRoles && !requiredRoles.includes(user.role)) {
-      navigate('/unauthorized');
-    }
-  }, [isLoading, isAuthenticated, user, requiredRoles, navigate]);
+    if (!isChecking && authStatus === AuthStatus.AUTHENTICATED && user && requiredRoles) {
+      const hasRequiredRole = user.occasionRoles.some(
+        occasionRole => occasionRole.roles.some(
+          role => requiredRoles.includes(role.role as UserRole)
+        )
+      );
 
-  return { user, isLoading };
+      if (!hasRequiredRole) {
+        navigate('/unauthorized');
+      }
+    }
+  }, [isChecking, authStatus, user, requiredRoles, navigate]);
+
+  return {
+    user,
+    isLoading: isChecking || authStatus === AuthStatus.LOADING
+  };
 };

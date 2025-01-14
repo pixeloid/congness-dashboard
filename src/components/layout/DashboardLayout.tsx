@@ -18,7 +18,7 @@ import { UserRole } from '@/types/auth';
 import Logo from '@/components/common/Logo';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import { useOccasionsStore } from '@/store/occasionsStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore, AuthStatus } from '@/store/authStore';
 import clsx from 'clsx';
 
 interface NavigationItem {
@@ -33,8 +33,15 @@ const DashboardLayout: React.FC = () => {
   const [abstractsOpen, setAbstractsOpen] = useState(false);
   const { occasionId } = useParams<{ occasionId: string }>();
   const { occasions, actions: { setSelectedOccasion } } = useOccasionsStore();
-  const { user, actions: { logout } } = useAuthStore();
+  const { user, authStatus, actions: { logout } } = useAuthStore();
   const navigate = useNavigate();
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (authStatus === AuthStatus.UNAUTHENTICATED) {
+      navigate('/login');
+    }
+  }, [authStatus, navigate]);
 
   // Find the current occasion with proper type checking
   const currentOccasion = occasionId ? occasions.find(o => o.id === parseInt(occasionId)) : null;

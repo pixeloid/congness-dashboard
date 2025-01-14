@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { InformationCircleIcon } from '@heroicons/react/16/solid';
 import clsx from 'clsx';
+import { UserRole } from '@/types/auth';
 
 const AbstractDetailsPage = () => {
   const { abstractId, occasionId } = useParams<{ abstractId: string; occasionId: string }>();
@@ -55,13 +56,23 @@ const AbstractDetailsPage = () => {
   if (error) return <ErrorMessage message={error} />;
   if (!abstract) return <ErrorMessage message="Abstract not found" />;
 
-  const isReviewer = user?.role === 'scientific_reviewer' || user?.role === 'chief_reviewer';
+  const isReviewer = user?.occasionRoles.some(role =>
+    role.occasionId === parseInt(occasionId!, 10) &&
+    role.roles.some(r =>
+      r.role === UserRole.SCIENTIFIC_REVIEWER || r.role === UserRole.CHIEF_REVIEWER
+    )
+  );
+
+  const isChiefReviewer = user?.occasionRoles.some(role =>
+    role.occasionId === parseInt(occasionId!, 10) &&
+    role.roles.some(r => r.role === UserRole.CHIEF_REVIEWER)
+  );
   const canReview = isReviewer &&
     abstract.status === 'in_review' &&
     !userReview &&
     !isReviewDeadlinePassed;
 
-  const canMakeDecision = user?.role === 'chief_reviewer' &&
+  const canMakeDecision = isChiefReviewer &&
     abstract.status === 'in_review' &&
     reviews.length >= 2 &&
     isReviewDeadlinePassed;
@@ -195,7 +206,7 @@ const AbstractDetailsPage = () => {
         </div>
       )}
 
-      {user?.role === 'chief_reviewer' && !isReviewDeadlinePassed && (
+      {isChiefReviewer && !isReviewDeadlinePassed && (
         <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6">
           <div className="flex items-center gap-4 text-white/70">
             <InformationCircleIcon className="h-5 w-5" />
