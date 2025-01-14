@@ -8,26 +8,26 @@ const initialReviews: Review[] = [
   {
     id: 1,
     abstractId: 1,
-    reviewerId: 1,
+    reviewerId: 3, // Szakmai Bíráló 1 (Dr. Szabó Anna)
     rating: 8,
-    comments: "Strong methodology and clear results",
+    comments: "Klinikai kutatás és neurológia szempontjából kiváló munka",
     recommendation: 'accept',
     status: 'completed',
     assignedAt: "2024-01-16T10:00:00Z",
     completedAt: "2024-01-18T15:30:00Z",
-    deadline: "2024-01-20T23:59:59Z"
+    deadline: "2024-03-01T23:59:59Z"
   },
   {
     id: 2,
     abstractId: 1,
-    reviewerId: 2,
+    reviewerId: 4, // Szakmai Bíráló 2 (Dr. Kiss Márta)
     rating: 9,
-    comments: "Excellent contribution to the field",
+    comments: "Kardiológia és orvosi technológia szempontjából jelentős eredmények",
     recommendation: 'accept',
     status: 'completed',
     assignedAt: "2024-01-16T10:00:00Z",
     completedAt: "2024-01-17T14:20:00Z",
-    deadline: "2024-01-20T23:59:59Z"
+    deadline: "2024-03-01T23:59:59Z"
   },
   {
     id: 3,
@@ -39,6 +39,18 @@ const initialReviews: Review[] = [
     status: 'completed',
     assignedAt: "2024-01-16T10:00:00Z",
     completedAt: "2024-01-19T11:45:00Z",
+    deadline: "2024-01-20T23:59:59Z"
+  },
+  {
+    id: 4,
+    abstractId: 2,
+    reviewerId: 3,
+    rating: 4,
+    comments: "Methodology needs significant improvement",
+    recommendation: 'reject',
+    status: 'completed',
+    assignedAt: "2024-01-16T10:00:00Z",
+    completedAt: "2024-01-18T09:15:00Z",
     deadline: "2024-01-20T23:59:59Z"
   }
 ];
