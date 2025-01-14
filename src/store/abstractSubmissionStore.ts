@@ -103,10 +103,10 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
               id: 1,
               occasionId,
               isPublic: false,
-              submissionDeadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
-              startDate: new Date().toISOString(),
-              endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-              reviewDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days for testing
+              startDate: "2024-01-13T00:00:00Z",
+              submissionDeadline: "2024-03-01T23:59:59Z",
+              reviewDeadline: "2024-06-01T23:59:59Z",
+              endDate: "2024-12-15T23:59:59Z",
               maxAbstracts: 3,
               categories: dummyCategories,
               guidelines: "Sample guidelines"

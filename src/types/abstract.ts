@@ -36,6 +36,17 @@ export interface Review {
   deadline: string;
 }
 
+export interface AbstractPresentation {
+  id: string;
+  title: string;
+  description: string;
+  authors: Author[];
+  duration: number;
+  type: 'session';
+  presentationType: PresentationType;
+  abstractId: number;
+}
+
 export interface Reviewer {
   id: number;
   userId: number;

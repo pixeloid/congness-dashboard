@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { Abstract, Review } from '@/types/abstract';
+import { Abstract, Review, AbstractPresentation } from '@/types/abstract';
+import { v4 as uuidv4 } from 'uuid';
 import { abstracts as initialAbstracts } from '@/data/abstractsData';
 
 // Mock review data
@@ -91,11 +92,12 @@ interface AbstractState {
     submitReview: (review: Omit<Review, 'id' | 'status' | 'assignedAt'>) => Promise<void>;
     makeDecision: (abstractId: number, decision: 'accept' | 'reject', presentationType?: 'oral' | 'poster') => Promise<void>;
     inviteSubmitter: (email: string, occasionId: number) => Promise<void>;
+    createPresentation: (abstractId: number) => AbstractPresentation | null;
   };
 }
 
 export const useAbstractStore = create<AbstractState>()(
-  immer((set) => ({
+  immer((set, get) => ({
     abstracts: initialAbstracts,
     reviews: initialReviews,
     isLoading: false,
@@ -184,6 +186,28 @@ export const useAbstractStore = create<AbstractState>()(
         } catch (error) {
           set({ error: 'Failed to make decision', isLoading: false });
         }
+      },
+
+      createPresentation: (abstractId) => {
+        const abstract = get().abstracts.find(a => a.id === abstractId);
+
+        if (!abstract || abstract.status !== 'accepted' || !abstract.presentationType) {
+          return null;
+        }
+
+        // Default durations based on presentation type
+        const duration = abstract.presentationType === 'oral' ? 20 : 10;
+
+        return {
+          id: uuidv4(),
+          title: abstract.title,
+          description: abstract.description,
+          authors: abstract.authors,
+          duration,
+          type: 'session',
+          presentationType: abstract.presentationType,
+          abstractId: abstract.id
+        };
       },
 
       inviteSubmitter: async (email, occasionId) => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowsRightLeftIcon,
+  BuildingOffice2Icon,
   ChartBarIcon,
   CalendarIcon,
   UserGroupIcon,
@@ -268,6 +269,13 @@ const DashboardLayout: React.FC = () => {
               </button>
             </div>
           </div>
+          <button
+            onClick={() => navigate('/occasions')}
+            className="mt-4 w-full flex items-center px-3 py-2 text-sm text-foreground-light/70 dark:text-foreground-dark/70 rounded-lg hover:bg-white/10 hover:text-accent transition-colors"
+          >
+            <BuildingOffice2Icon className="h-5 w-5 mr-3" />
+            Manage All Occasions
+          </button>
         </div>
       </div>
 

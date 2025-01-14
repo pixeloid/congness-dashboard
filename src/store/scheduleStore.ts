@@ -1,21 +1,22 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { Schedule, Day, Track, Section, ScheduleItem, ScheduleItemType } from '@/types/schedule';
-import { Abstract } from '@/types/abstract';
-import { v4 as uuidv4 } from 'uuid';
+import { Schedule, Day, Track, Section, ScheduleItem } from '@/types/schedule';
+import { AbstractPresentation } from '@/types/abstract';
+import { v4 } from 'uuid';
 import { addDays } from 'date-fns';
 
 interface ScheduleState {
   schedule: Schedule | null;
   templates: ScheduleItem[];
-  presentations: ScheduleItem[]; // Derived from abstracts
+  presentations: ScheduleItem[];
   isLoading: boolean;
   error: string | null;
   actions: {
+    getSchedule: () => Schedule | null;
+    initializeFromAbstracts: (abstracts: AbstractPresentation[]) => void;
     // Schedule actions
     initializeSchedule: (occasionId: number) => void;
     fetchSchedule: (occasionId: number) => Promise<void>;
-    initializeFromAbstracts: (abstracts: Abstract[]) => void;
     saveSchedule: () => Promise<void>;
 
     // Day actions
@@ -73,28 +74,45 @@ export const useScheduleStore = create<ScheduleState>()(
         title: 'Kávészünet',
         duration: 30,
         type: 'coffee',
-        isTemplate: true,
-        items: []
+        isTemplate: true
       }
     ],
     presentations: [],
     isLoading: false,
     error: null,
     actions: {
+      getSchedule: () => get().schedule,
+
+      initializeFromAbstracts: (presentations) => {
+        set(state => {
+          if (!state.schedule) return;
+
+          // Add all presentations to the first day's first track
+          const firstDay = state.schedule.days[0];
+          const firstTrack = firstDay?.tracks[0];
+
+          if (firstDay && firstTrack) {
+            presentations.forEach(presentation => {
+              firstTrack.presentations.push(presentation);
+            });
+          }
+        });
+      },
+
       initializeSchedule: (occasionId) => {
         const startDate = new Date();
         startDate.setHours(9, 0, 0, 0);
 
         set({
           schedule: {
-            id: uuidv4(),
+            id: v4(),
             occasionId,
             days: [{
-              id: uuidv4(),
+              id: v4(),
               date: startDate,
               startTime: startDate,
               tracks: [{
-                id: uuidv4(),
+                id: v4(),
                 title: 'Main Track',
                 presentations: [],
                 sections: []
@@ -120,65 +138,6 @@ export const useScheduleStore = create<ScheduleState>()(
         }
       },
 
-      initializeFromAbstracts: (abstracts) => {
-        set(state => {
-          // Convert accepted abstracts to schedule items
-          const presentationItems = abstracts
-            .filter(abstract => abstract.status === 'accepted')
-            .map(abstract => ({
-              id: uuidv4(),
-              title: abstract.title,
-              description: abstract.description,
-              duration: abstract.presentationType === 'oral' ? 20 : 10, // Default durations
-              type: 'session' as ScheduleItemType,
-              abstractId: abstract.id,
-              authors: abstract.authors.map(a => a.name).join(', '),
-              presentationType: abstract.presentationType
-            }));
-
-          state.presentations = presentationItems;
-
-          // If no schedule exists, create initial schedule with sections
-          if (!state.schedule) {
-            const startDate = new Date();
-            startDate.setHours(9, 0, 0, 0);
-
-            // Create sections for oral and poster presentations
-            const oralSection: Section = {
-              id: uuidv4(),
-              title: 'Szóbeli előadások',
-              type: 'session',
-              duration: 0,
-              items: presentationItems.filter(p => p.presentationType === 'oral')
-            };
-
-            const posterSection: Section = {
-              id: uuidv4(),
-              title: 'Poszter szekció',
-              type: 'session',
-              duration: 0,
-              items: presentationItems.filter(p => p.presentationType === 'poster')
-            };
-
-            state.schedule = {
-              id: uuidv4(),
-              occasionId: abstracts[0]?.occasionId || 0,
-              days: [{
-                id: uuidv4(),
-                date: startDate,
-                startTime: startDate,
-                tracks: [{
-                  id: uuidv4(),
-                  title: 'Fő program',
-                  presentations: [],
-                  sections: [oralSection, posterSection]
-                }]
-              }]
-            };
-          }
-        });
-      },
-
       saveSchedule: async () => {
         set({ isLoading: true, error: null });
         try {
@@ -200,11 +159,11 @@ export const useScheduleStore = create<ScheduleState>()(
           newStartTime.setHours(9, 0, 0, 0);
 
           state.schedule.days.push({
-            id: uuidv4(),
+            id: v4(),
             date: newDate,
             startTime: newStartTime,
             tracks: [{
-              id: uuidv4(),
+              id: v4(),
               title: 'Main Track',
               presentations: [],
               sections: []
@@ -236,7 +195,7 @@ export const useScheduleStore = create<ScheduleState>()(
           const day = state.schedule.days.find(d => d.id === dayId);
           if (day) {
             day.tracks.push({
-              id: uuidv4(),
+              id: v4(),
               title: `Track ${day.tracks.length + 1}`,
               presentations: [],
               sections: []
@@ -276,7 +235,7 @@ export const useScheduleStore = create<ScheduleState>()(
             const track = day.tracks.find(t => t.id === trackId);
             if (track) {
               track.sections.push({
-                id: uuidv4(),
+                id: v4(),
                 title: 'New Section',
                 description: '',
                 type: 'session',
@@ -327,7 +286,7 @@ export const useScheduleStore = create<ScheduleState>()(
           if (!track) return;
 
           const newItem = item.isTemplate
-            ? { ...item, id: uuidv4(), isTemplate: false }
+            ? { ...item, id: v4(), isTemplate: false }
             : { ...item };
 
           if (sectionId) {

@@ -4,6 +4,7 @@ import { useAbstractStore } from '@/store/abstractStore';
 import { useAbstractSubmissionStore } from '@/store/abstractSubmissionStore';
 import AbstractList from '@/components/abstracts/AbstractList';
 import AbstractFilters from '@/components/abstracts/AbstractFilters';
+import AbstractTimeline from '@/components/abstracts/AbstractTimeline';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { PlusIcon } from '@heroicons/react/24/outline';
@@ -79,6 +80,8 @@ const AbstractsPage = () => {
           <span>Új Absztrakt</span>
         </button>
       </div>
+
+      <AbstractTimeline />
 
       <AbstractFilters filters={filters} onFilterChange={setFilters} />
 

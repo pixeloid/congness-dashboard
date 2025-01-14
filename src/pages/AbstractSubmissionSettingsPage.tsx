@@ -10,6 +10,7 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import { PlusIcon, EnvelopeIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { AbstractCategory } from '@/types/abstractSubmission';
+import AbstractTimeline from '@/components/abstracts/AbstractTimeline';
 
 const AbstractSubmissionSettingsPage = () => {
   const { occasionId } = useParams<{ occasionId: string }>();
@@ -74,6 +75,7 @@ const AbstractSubmissionSettingsPage = () => {
         <h1 className="text-4xl font-bold text-white mb-2">Abstract Submission Settings</h1>
         <p className="text-lg text-white/70">Manage abstract categories and invitations</p>
       </div>
+      <AbstractTimeline />
 
       <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6">
         <div className="flex justify-between items-center mb-4">

@@ -2,12 +2,10 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAbstractStore } from '@/store/abstractStore';
 import ScheduleEditor from '../components/schedule/ScheduleEditor';
-import { useScheduleStore } from '@/store/scheduleStore';
 
 const SchedulePage: React.FC = () => {
   const { occasionId } = useParams<{ occasionId: string }>();
-  const { abstracts, actions: abstractActions } = useAbstractStore();
-  const { schedule, actions: scheduleActions } = useScheduleStore();
+  const { actions: abstractActions } = useAbstractStore();
 
   useEffect(() => {
     if (occasionId) {
@@ -16,12 +14,6 @@ const SchedulePage: React.FC = () => {
     }
   }, [occasionId, abstractActions]);
 
-  useEffect(() => {
-    if (abstracts.length > 0 && !schedule) {
-      // Initialize schedule with accepted abstracts
-      scheduleActions.initializeFromAbstracts(abstracts);
-    }
-  }, [abstracts, schedule, scheduleActions]);
 
   return (
     <div className="p-6 space-y-8">

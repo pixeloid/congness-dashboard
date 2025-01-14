@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAbstractStore } from '@/store/abstractStore';
 import { useAbstractSubmissionStore } from '@/store/abstractSubmissionStore';
+import { useScheduleStore } from '@/store/scheduleStore';
 import { useAuthStore } from '@/store/authStore';
+import AbstractTimeline from '@/components/abstracts/AbstractTimeline';
 import ReviewList from '@/components/abstracts/ReviewList';
 import ReviewForm from '@/components/abstracts/ReviewForm';
 import ReviewDeadlineCountdown from '@/components/abstracts/ReviewDeadlineCountdown';
 import AbstractStatusBadge from '@/components/abstracts/AbstractStatusBadge';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
-import { ArrowLeftIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, DocumentTextIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { InformationCircleIcon } from '@heroicons/react/16/solid';
@@ -31,9 +33,11 @@ const AbstractDetailsPage = () => {
     actions: {
       fetchReviews,
       submitReview,
-      makeDecision
+      makeDecision,
+      createPresentation
     }
   } = useAbstractStore();
+  const scheduleActions = useScheduleStore(state => state.actions);
   const { actions: submissionActions } = useAbstractSubmissionStore();
 
   const abstract = abstracts.find(a => a.id === Number(abstractId));
@@ -91,6 +95,30 @@ const AbstractDetailsPage = () => {
     }
   };
 
+  const handleMakeDecision = async (decision: 'accept' | 'reject', presentationType?: 'oral' | 'poster') => {
+    if (!abstract) return;
+
+    try {
+      await makeDecision(abstract.id, decision, presentationType);
+
+      // If accepted, create presentation and add to schedule
+      if (decision === 'accept' && presentationType) {
+        const presentation = createPresentation(abstract.id);
+        if (presentation) {
+          // Initialize schedule if needed
+          if (!scheduleActions.getSchedule()?.days?.length) {
+            await scheduleActions.initializeSchedule(parseInt(occasionId!, 10));
+          }
+
+          // Add presentation to schedule
+          scheduleActions.initializeFromAbstracts([presentation]);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to process decision:', error);
+    }
+  };
+
   return (
     <div className="p-6 space-y-8">
       <button
@@ -100,6 +128,8 @@ const AbstractDetailsPage = () => {
         <ArrowLeftIcon className="h-5 w-5 mr-2" />
         <span>Vissza az absztraktokhoz</span>
       </button>
+
+      <AbstractTimeline />
 
       <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6">
         <div className="flex justify-between items-start mb-6">
@@ -117,25 +147,47 @@ const AbstractDetailsPage = () => {
               <AbstractStatusBadge status={abstract.status} />
             </div>
           </div>
-          {isReviewer && !isReviewFormOpen && (
-            <button
-              onClick={() => setIsReviewFormOpen(true)}
-              className={clsx(
-                "inline-flex items-center px-4 py-2 rounded-lg transition-colors",
-                canReview
-                  ? "bg-accent text-navy-dark hover:bg-accent-light"
-                  : "bg-navy/50 text-white/50 cursor-not-allowed"
-              )}
-              disabled={!canReview}
-            >
-              <DocumentTextIcon className="h-5 w-5 mr-2" />
-              {userReview
-                ? "Már bírálva"
-                : isReviewDeadlinePassed
-                  ? "Bírálati határidő lejárt"
-                  : "Bírálat hozzáadása"}
-            </button>
-          )}
+          <div className="flex gap-4">
+            {abstract.status === 'accepted' && (
+              <button
+                onClick={() => {
+                  const presentation = createPresentation(abstract.id);
+                  if (presentation) {
+                    // Initialize schedule if needed
+                    if (!scheduleActions.getSchedule()?.days?.length) {
+                      scheduleActions.initializeSchedule(parseInt(occasionId!, 10));
+                    }
+
+                    // Add presentation to schedule
+                    scheduleActions.initializeFromAbstracts([presentation]);
+                  }
+                }}
+                className="inline-flex items-center px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
+              >
+                <CalendarIcon className="h-5 w-5 mr-2" />
+                Add to Schedule
+              </button>
+            )}
+            {isReviewer && !isReviewFormOpen && (
+              <button
+                onClick={() => setIsReviewFormOpen(true)}
+                className={clsx(
+                  "inline-flex items-center px-4 py-2 rounded-lg transition-colors",
+                  canReview
+                    ? "bg-accent text-navy-dark hover:bg-accent-light"
+                    : "bg-navy/50 text-white/50 cursor-not-allowed"
+                )}
+                disabled={!canReview}
+              >
+                <DocumentTextIcon className="h-5 w-5 mr-2" />
+                {userReview
+                  ? "Már bírálva"
+                  : isReviewDeadlinePassed
+                    ? "Bírálati határidő lejárt"
+                    : "Bírálat hozzáadása"}
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="prose prose-invert max-w-none">
@@ -185,19 +237,19 @@ const AbstractDetailsPage = () => {
           </h2>
           <div className="flex gap-4">
             <button
-              onClick={() => makeDecision(abstract.id, 'accept', 'oral')}
+              onClick={() => handleMakeDecision('accept', 'oral')}
               className="px-4 py-2 bg-green-500 text-white rounded-lg"
             >
               Elfogadás szóbeli előadásként
             </button>
             <button
-              onClick={() => makeDecision(abstract.id, 'accept', 'poster')}
+              onClick={() => handleMakeDecision('accept', 'poster')}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg"
             >
               Elfogadás poszterként
             </button>
             <button
-              onClick={() => makeDecision(abstract.id, 'reject')}
+              onClick={() => handleMakeDecision('reject')}
               className="px-4 py-2 bg-red-500 text-white rounded-lg"
             >
               Elutasítás

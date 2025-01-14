@@ -23,6 +23,8 @@ import OccasionSelectionPage from './pages/OccasionSelectionPage';
 import AuthGuard from './components/auth/AuthGuard';
 import CheckpointsPage from '@/pages/CheckpointsPage';
 import { UserRole } from '@/types/auth';
+import OccasionsPage from '@/pages/OccasionsPage';
+import OccasionDetailsPage from '@/pages/OccasionDetailsPage';
 
 const App = () => {
   const { actions } = useAuthStore();
@@ -48,12 +50,20 @@ const App = () => {
           </AuthGuard>
         } />
 
+        {/* Occasions Management */}
+        <Route path="/occasions" element={
+          <AuthGuard allowedRoles={[UserRole.EVENT_MANAGER]}>
+            <OccasionsPage />
+          </AuthGuard>
+        } />
+
         {/* Dashboard layout routes */}
         <Route path="/occasions/:occasionId" element={
           <AuthGuard>
             <DashboardLayout />
           </AuthGuard>
         }>
+          <Route path="details" element={<OccasionDetailsPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="schedule" element={
