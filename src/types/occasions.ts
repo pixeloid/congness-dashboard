@@ -25,11 +25,12 @@ export interface Occasion {
   description?: string;
   url?: string;
   logo?: string;
+  type: 'conference' | 'workshop' | 'training' | 'seminar';
   startDate: string;
   endDate: string;
   venue: Venue;
   contact: Contact;
-  
+
   // Related entities
   schedule?: {
     id: string;

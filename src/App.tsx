@@ -25,6 +25,9 @@ import CheckpointsPage from '@/pages/CheckpointsPage';
 import { UserRole } from '@/types/auth';
 import OccasionsPage from '@/pages/OccasionsPage';
 import OccasionDetailsPage from '@/pages/OccasionDetailsPage';
+import EventsPage from '@/pages/EventsPage';
+import TimelinePage from '@/pages/TimelinePage';
+import CalendarPage from '@/pages/CalendarPage';
 
 const App = () => {
   const { actions } = useAuthStore();
@@ -37,6 +40,9 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
+        <Route path="/" element={<EventsPage />} />
+        <Route path="/timeline" element={<TimelinePage />} />
+        <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="/abstracts/invitation/:token" element={<InvitationResponsePage />} />

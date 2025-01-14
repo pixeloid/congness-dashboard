@@ -45,16 +45,16 @@ const AbstractTimeline: React.FC = () => {
     };
 
 
-    const getCurrentPhase = () => {
-        if (isBefore(now, startDate)) return 'not_started';
-        if (isBefore(now, submissionDeadline)) return 'submission';
-        if (isBefore(now, reviewDeadline)) return 'review';
-        if (isBefore(now, chiefReviewDeadline)) return 'chief_review';
-        if (isBefore(now, endDate)) return 'completed';
-        return 'completed';
-    };
+    //  const getCurrentPhase = () => {
+    //      if (isBefore(now, startDate)) return 'not_started';
+    //      if (isBefore(now, submissionDeadline)) return 'submission';
+    //      if (isBefore(now, reviewDeadline)) return 'review';
+    //      if (isBefore(now, chiefReviewDeadline)) return 'chief_review';
+    //      if (isBefore(now, endDate)) return 'completed';
+    //      return 'completed';
+    //  };
 
-    const currentPhase = getCurrentPhase();
+    // const currentPhase = getCurrentPhase();
 
     return (
         <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 py-6 px-24 mb-8">

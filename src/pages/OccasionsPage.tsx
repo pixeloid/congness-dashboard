@@ -36,7 +36,8 @@ const OccasionsPage = () => {
             contact: {
               name: '',
               email: ''
-            }
+            },
+            type: 'conference' // Add the appropriate type value here
           })}
           className="inline-flex items-center px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
         >
