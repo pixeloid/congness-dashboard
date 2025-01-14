@@ -35,10 +35,11 @@ export const abstracts: Abstract[] = [
         isPresenting: true
       }
     ],
-    status: "in_review",
+    status: "accepted",
     submittedAt: "2024-01-16T14:20:00Z",
     submitterId: 2,
-    occasionId: 1
+    occasionId: 1,
+    presentationType: "oral"
   },
   {
     id: 3,
@@ -77,5 +78,45 @@ export const abstracts: Abstract[] = [
     submittedAt: "2024-01-18T11:30:00Z",
     submitterId: 3,
     occasionId: 1
+  },
+  {
+    id: 5,
+    title: "Blockchain alapú IoT biztonság",
+    description: "Új megközelítések IoT eszközök biztonságának növelésére blockchain technológiával",
+    keywords: ["blockchain", "IoT", "biztonság"],
+    authors: [
+      {
+        id: 5,
+        name: "Dr. Szabó Péter",
+        email: "szabo.peter@example.com",
+        affiliation: "Tech University",
+        isPresenting: true
+      }
+    ],
+    status: "in_review",
+    submittedAt: "2024-05-15T10:30:00Z",
+    submitterId: 5,
+    occasionId: 2,
+    presentationType: "oral"
+  },
+  {
+    id: 6,
+    title: "Kvantumszámítógépek a kriptográfiában",
+    description: "A kvantumszámítógépek hatása a modern kriptográfiai módszerekre",
+    keywords: ["kvantumszámítógép", "kriptográfia", "biztonság"],
+    authors: [
+      {
+        id: 6,
+        name: "Dr. Kiss János",
+        email: "kiss.janos@example.com",
+        affiliation: "Quantum Research Lab",
+        isPresenting: true
+      }
+    ],
+    status: "accepted",
+    submittedAt: "2024-05-16T14:20:00Z",
+    submitterId: 6,
+    occasionId: 2,
+    presentationType: "oral"
   }
 ];

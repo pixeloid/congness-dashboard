@@ -32,10 +32,10 @@ const initialReviews: Review[] = [
   {
     id: 3,
     abstractId: 2,
-    reviewerId: 1,
+    reviewerId: 3,
     rating: 6,
-    comments: "Needs minor revisions",
-    recommendation: 'revise',
+    comments: "Klinikai kutatás és neurológia szempontjából megfelelő",
+    recommendation: 'accept',
     status: 'completed',
     assignedAt: "2024-01-16T10:00:00Z",
     completedAt: "2024-01-19T11:45:00Z",
@@ -44,14 +44,38 @@ const initialReviews: Review[] = [
   {
     id: 4,
     abstractId: 2,
-    reviewerId: 3,
+    reviewerId: 4,
     rating: 4,
-    comments: "Methodology needs significant improvement",
-    recommendation: 'reject',
+    comments: "Kardiológia és orvosi technológia szempontjából átgondolandó",
+    recommendation: 'accept',
     status: 'completed',
     assignedAt: "2024-01-16T10:00:00Z",
     completedAt: "2024-01-18T09:15:00Z",
     deadline: "2024-01-20T23:59:59Z"
+  },
+  {
+    id: 5,
+    abstractId: 5,
+    reviewerId: 3,
+    rating: 8,
+    comments: "Innovatív megközelítés, jól kidolgozott módszertan",
+    recommendation: 'accept',
+    status: 'completed',
+    assignedAt: "2024-05-16T10:00:00Z",
+    completedAt: "2024-05-18T15:30:00Z",
+    deadline: "2024-06-01T23:59:59Z"
+  },
+  {
+    id: 6,
+    abstractId: 5,
+    reviewerId: 4,
+    rating: 9,
+    comments: "Kiemelkedő kutatási eredmények",
+    recommendation: 'accept',
+    status: 'completed',
+    assignedAt: "2024-05-16T10:00:00Z",
+    completedAt: "2024-05-17T14:20:00Z",
+    deadline: "2024-06-01T23:59:59Z"
   }
 ];
 
