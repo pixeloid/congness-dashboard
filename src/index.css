@@ -1,7 +1,7 @@
-@import '@fontsource/poppins/400.css';
-@import '@fontsource/poppins/500.css';
-@import '@fontsource/poppins/600.css';
-@import '@fontsource/poppins/700.css';
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
+@import "@fontsource/poppins/600.css";
+@import "@fontsource/poppins/700.css";
 
 @tailwind base;
 @tailwind components;
@@ -11,21 +11,50 @@
   body {
     @apply bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark transition-colors duration-300;
   }
-  
+
   #root {
     min-height: 100vh;
     @apply bg-gradient-to-b from-background-light to-surface-light dark:from-background-dark dark:to-surface-dark;
-    background-image: 
-      radial-gradient(circle at 0% 0%, theme('colors.accent.DEFAULT/20') 0%, transparent 50%),
-      radial-gradient(circle at 100% 0%, theme('colors.secondary.DEFAULT/20') 0%, transparent 50%),
-      radial-gradient(circle at 50% 100%, theme('colors.accent.DEFAULT/20') 0%, transparent 50%);
+    background-image: radial-gradient(
+        circle at 0% 0%,
+        theme("colors.accent.DEFAULT/20") 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 100% 0%,
+        theme("colors.secondary.DEFAULT/20") 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 50% 100%,
+        theme("colors.accent.DEFAULT/20") 0%,
+        transparent 50%
+      );
+  }
+}
+
+@layer utilities {
+  .shadow-glow {
+    box-shadow: 0 0 10px theme("colors.accent.DEFAULT/30"),
+      0 0 20px theme("colors.accent.DEFAULT/20");
   }
 }
 
 /* Add gradient background to full-page routes */
 .min-h-screen {
-  background-image: 
-    radial-gradient(circle at 0% 0%, theme('colors.accent.DEFAULT/20') 0%, transparent 50%),
-    radial-gradient(circle at 100% 0%, theme('colors.secondary.DEFAULT/20') 0%, transparent 50%),
-    radial-gradient(circle at 50% 100%, theme('colors.accent.DEFAULT/20') 0%, transparent 50%);
+  background-image: radial-gradient(
+      circle at 0% 0%,
+      theme("colors.accent.DEFAULT/20") 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 100% 0%,
+      theme("colors.secondary.DEFAULT/20") 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      theme("colors.accent.DEFAULT/20") 0%,
+      transparent 50%
+    );
 }

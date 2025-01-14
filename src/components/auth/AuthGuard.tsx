@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { OccasionRole, UserRole } from '@/types/auth';
+import { UserRole } from '@/types/auth';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { useAuthStore, AuthStatus } from '@/store/authStore';
 
@@ -15,22 +15,30 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles, occasionI
   const location = useLocation();
 
   const hasRequiredRole = (): boolean => {
-    // If no roles required or no occasion specified, allow access
-    if (!allowedRoles || !occasionId) return true;
+    // If no roles required, allow access
+    if (!allowedRoles) return true;
 
     // Must have user for role checks
     if (!user) return false;
 
-    // Find user's roles for this occasion
-    const occasionRole = user.occasionRoles.find(
-      role => role.occasionId === parseInt(occasionId.toString(), 10)
-    );
+    // If checking occasion-specific roles
+    if (occasionId) {
+      const occasionRole = user.occasionRoles.find(
+        role => role.occasionId === parseInt(occasionId.toString(), 10)
+      );
 
-    if (!occasionRole) return false;
+      if (!occasionRole) return false;
 
-    // Check if user has any of the allowed roles
-    return occasionRole.roles.some((userRole: OccasionRole) =>
-      allowedRoles.includes(userRole.role as UserRole)
+      return occasionRole.roles.some((userRole) =>
+        allowedRoles.includes(userRole.role as UserRole)
+      );
+    }
+
+    // For non-occasion routes, check if user has the role in any occasion
+    return user.occasionRoles.some(role =>
+      role.roles.some(userRole =>
+        allowedRoles.includes(userRole.role as UserRole)
+      )
     );
   };
 

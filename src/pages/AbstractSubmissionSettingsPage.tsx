@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAbstractSubmissionStore } from '@/store/abstractSubmissionStore';
+import AbstractTimeline from '@/components/abstracts/AbstractTimeline';
 import CategoryList from '@/components/abstracts/CategoryList';
 import CategoryForm from '@/components/abstracts/CategoryForm';
 import InvitationList from '@/components/abstracts/InvitationList';
@@ -10,7 +11,6 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import { PlusIcon, EnvelopeIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { AbstractCategory } from '@/types/abstractSubmission';
-import AbstractTimeline from '@/components/abstracts/AbstractTimeline';
 
 const AbstractSubmissionSettingsPage = () => {
   const { occasionId } = useParams<{ occasionId: string }>();
@@ -45,7 +45,7 @@ const AbstractSubmissionSettingsPage = () => {
     }
   };
 
-  const handleDeadlineChange = (field: 'submissionDeadline' | 'reviewDeadline', value: string) => {
+  const handleDeadlineChange = (field: 'submissionDeadline' | 'reviewDeadline' | 'chiefReviewDeadline', value: string) => {
     if (process && occasionId) {
       const newDate = new Date(value);
       // Ensure end of day for deadlines
@@ -75,6 +75,7 @@ const AbstractSubmissionSettingsPage = () => {
         <h1 className="text-4xl font-bold text-white mb-2">Abstract Submission Settings</h1>
         <p className="text-lg text-white/70">Manage abstract categories and invitations</p>
       </div>
+
       <AbstractTimeline />
 
       <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6">
@@ -118,6 +119,21 @@ const AbstractSubmissionSettingsPage = () => {
                 After this date, chief reviewer can make final decisions
               </p>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1">
+                Chief Review Period Deadline*
+              </label>
+              <input
+                type="datetime-local"
+                value={process?.chiefReviewDeadline ? format(new Date(process.chiefReviewDeadline), "yyyy-MM-dd'T'HH:mm") : ''}
+                onChange={(e) => handleDeadlineChange('chiefReviewDeadline', e.target.value)}
+                className="w-full px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white"
+                required
+              />
+              <p className="mt-1 text-sm text-white/50">
+                Chief reviewer must make all final decisions by this date
+              </p>
+            </div>
           </div>
 
           <div className="mt-4 p-4 bg-navy/50 rounded-lg border border-white/10">
@@ -125,7 +141,8 @@ const AbstractSubmissionSettingsPage = () => {
             <ul className="space-y-2 text-sm text-white/70">
               <li>• Submission deadline: No new abstracts can be submitted after this date</li>
               <li>• Review deadline: Scientific reviewers can submit reviews until this date</li>
-              <li>• Chief reviewer can make final decisions only after review deadline</li>
+              <li>• Chief reviewer can make final decisions between review deadline and chief review deadline</li>
+              <li>• All decisions must be made by the chief review deadline</li>
               <li>• All deadlines are set to end of day (23:59:59)</li>
             </ul>
           </div>

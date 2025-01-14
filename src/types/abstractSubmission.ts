@@ -23,6 +23,7 @@ export interface AbstractSubmissionProcess {
   occasionId: number;
   isPublic: boolean;
   submissionDeadline: string;
+  chiefReviewDeadline: string;
   startDate: string;
   endDate: string;
   maxAbstracts: number;

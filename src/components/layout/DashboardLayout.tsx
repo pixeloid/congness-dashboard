@@ -236,6 +236,13 @@ const DashboardLayout: React.FC = () => {
                 </div>
               )}
             </div>
+            {hasRole([UserRole.EVENT_MANAGER]) && (<Link
+              to={'/occasions'}
+              className="mt-4 w-full flex items-center px-3 py-2 text-sm text-foreground-light/70 dark:text-foreground-dark/70 rounded-lg hover:bg-white/10 hover:text-accent transition-colors"
+            >
+              <BuildingOffice2Icon className="h-5 w-5 mr-3" />
+              Manage All Occasions
+            </Link>)}
           </nav>
 
           {/* User section */}
@@ -269,13 +276,6 @@ const DashboardLayout: React.FC = () => {
               </button>
             </div>
           </div>
-          <button
-            onClick={() => navigate('/occasions')}
-            className="mt-4 w-full flex items-center px-3 py-2 text-sm text-foreground-light/70 dark:text-foreground-dark/70 rounded-lg hover:bg-white/10 hover:text-accent transition-colors"
-          >
-            <BuildingOffice2Icon className="h-5 w-5 mr-3" />
-            Manage All Occasions
-          </button>
         </div>
       </div>
 
