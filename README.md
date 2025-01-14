@@ -1,14 +1,14 @@
-# Congness Dashboard
+# Konferencia Irányítópult
 
-Modern conference and event management dashboard built with React, featuring:
+Modern konferencia- és rendezvénykezelő irányítópult React alapokon, a következő funkciókkal:
 
-- Drag & drop schedule management
-- Multi-track support
-- Template-based event planning
-- Real-time timeline calculations
-- Responsive bento-style UI
+- Húzd és ejtsd program kezelés
+- Több szekció támogatása
+- Sablon alapú eseménytervezés
+- Valós idejű időbeosztás számítások
+- Reszponzív bento-stílusú felület
 
-## Tech Stack
+## Technológiai Stack
 
 - React
 - Vite
@@ -16,78 +16,87 @@ Modern conference and event management dashboard built with React, featuring:
 - DND Kit
 - Date FNS
 
-## Development
+## Fejlesztés
 
 ```bash
-# Install dependencies
+# Függőségek telepítése
 npm install
 
-# Start development server
+# Fejlesztői szerver indítása
 npm run dev
 
-# Build for production
+# Éles verzió építése
 npm run build
 ```
 
-## Testing Review System
+## Bírálati Rendszer Tesztelése
 
-Use these accounts to test different review functionalities:
+A különböző bírálati funkciók teszteléséhez használd ezeket a fiókokat:
 
-### Scientific Reviewers
+### Szakmai Bírálók
 
-1. Login as Scientific Reviewer 1:
+1. Bejelentkezés Szakmai Bíráló 1-ként:
 
    - Email: szabo.anna@example.com
-   - Can review abstracts before deadline
-   - Cannot make final decisions
+   - Absztraktokat bírálhat a határidő előtt
+   - Nem hozhat végső döntéseket
 
-2. Login as Scientific Reviewer 2:
+2. Bejelentkezés Szakmai Bíráló 2-ként:
    - Email: kiss.marta@example.com
-   - Can review abstracts before deadline
-   - Cannot make final decisions
+   - Absztraktokat bírálhat a határidő előtt
+   - Nem hozhat végső döntéseket
 
-### Chief Reviewer
+### Főbíráló
 
-Login as Chief Reviewer:
+Bejelentkezés Főbírálóként:
 
 - Email: kovacs.peter@example.com
-- Can review abstracts before deadline
-- Can make final decisions only after deadline
+- Absztraktokat bírálhat a határidő előtt
+- Végső döntéseket csak a határidő után hozhat
 
-### Test Cases
+### Tesztesetek
 
-1. Abstract #1 (Active Review Period):
+1. "Új megközelítések az orvosi képalkotásban" (Aktív Bírálati Időszak):
 
-   - Review deadline: Future date
-   - Scientific reviewers can submit reviews
-   - Chief reviewer cannot make final decision yet
+   - Nemzetközi Orvosi Konferencia 2024
+   - Szerző: Dr. Nagy János (nagy.janos@example.com)
+   - Bírálati határidő: 2024. március 1.
+   - Szakmai bírálók beküldhetnek bírálatokat
+   - Főbíráló még nem hozhat végső döntést
 
-2. Abstract #2 (Review Period Ended):
-   - Review deadline: Past date
-   - Scientific reviewers cannot submit new reviews
-   - Chief reviewer can make final decision
+2. "Gépi tanulás a diagnosztikai eljárásokban" (Bírálati Időszak Lezárult):
+   - Nemzetközi Orvosi Konferencia 2024
+   - Szerző: Dr. Johnson (accepted@example.com)
+   - Bírálati határidő: 2024. január 20.
+   - Szakmai bírálók nem küldhetnek új bírálatokat
+   - Főbíráló hozhat végső döntést
 
-### Testing Steps
+### Tesztelési Lépések
 
-1. Test Scientific Reviewer Flow:
+1. Szakmai Bíráló Folyamat Tesztelése:
 
-   - Login as Scientific Reviewer 1
-   - Navigate to Abstracts
-   - Try reviewing Abstract #1 (should work)
-   - Try reviewing Abstract #2 (should be disabled)
+   - Bejelentkezés Szakmai Bíráló 1-ként
+   - Navigálás a "Nemzetközi Orvosi Konferencia 2024" eseményhez
+   - "Új megközelítések az orvosi képalkotásban" bírálása (működnie kell)
+   - "Gépi tanulás a diagnosztikai eljárásokban" bírálása (letiltva kell lennie)
 
-2. Test Chief Reviewer Flow:
+2. Főbíráló Folyamat Tesztelése:
 
-   - Login as Chief Reviewer
-   - Navigate to Abstracts
-   - Verify Abstract #1 shows "waiting for deadline"
-   - Verify Abstract #2 shows final decision options
+   - Bejelentkezés Főbírálóként
+   - Navigálás a "Nemzetközi Orvosi Konferencia 2024" eseményhez
+   - Ellenőrizd, hogy az "Új megközelítések az orvosi képalkotásban" absztraktnál "várakozás a határidőre" látható
+   - Ellenőrizd, hogy a "Gépi tanulás a diagnosztikai eljárásokban" absztraktnál megjelennek a végső döntési opciók:
+     - Elfogadás szóbeli előadásként
+     - Elfogadás poszterként
+     - Elutasítás
 
-3. Test Multiple Reviews:
-   - Login as different reviewers
-   - Submit multiple reviews
-   - Verify chief reviewer can only decide after deadline
+3. Többszörös Bírálatok Tesztelése:
+   - Bejelentkezés különböző bírálókként
+   - Bírálatok beküldése az "Új megközelítések az orvosi képalkotásban" absztrakthoz:
+     - Szakmai Bíráló 1: Klinikai kutatás és neurológia szempontjából
+     - Szakmai Bíráló 2: Kardiológia és orvosi technológia szempontjából
+   - Ellenőrizd, hogy a főbíráló csak a határidő után dönthet
 
-## License
+## Licenc
 
-Private repository - All rights reserved
+Privát repository - Minden jog fenntartva
