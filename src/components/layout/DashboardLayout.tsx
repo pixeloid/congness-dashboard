@@ -53,6 +53,7 @@ const DashboardLayout: React.FC = () => {
   const currentOccasion = occasions && occasionCode ? occasions.find(o => o.code === occasionCode) : null;
 
   const hasRole = (roles?: UserRole[]): boolean => {
+    roles;
     return true;
     //if (!roles || !user || !occasionCode) return true;
 

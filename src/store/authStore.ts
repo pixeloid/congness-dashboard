@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { persist } from 'zustand/middleware';
-import { User, UserRole } from '@/types/auth';
+import { User } from '@/types/auth';
 import api from '@/api/api';
 
 export enum AuthStatus {
@@ -22,7 +22,7 @@ interface AuthStore {
     updateUser: (updates: Partial<User>) => void;
   };
 }
-
+/* 
 // Mock user data for development
 const mockUsers: User[] = [
   {
@@ -117,7 +117,7 @@ const mockUsers: User[] = [
     ]
   }
 ];
-
+ */
 export const useAuthStore = create<AuthStore>()(
   persist(
     immer((set, get) => ({

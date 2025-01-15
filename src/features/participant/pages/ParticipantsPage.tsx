@@ -10,9 +10,8 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import { UserPlusIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { useCreateParticipant, useDeleteParticipant, useParticipants, useUpdateParticipant } from '@/features/participant/hooks/queries/useParticipant';
+import { useCreateParticipant, useDeleteParticipant, useParticipants } from '@/features/participant/hooks/queries/useParticipant';
 import { useParticipantsStore } from '@/features/participant/store/participantsStore';
-import { useCreateOccasion } from '@/features/occasion/hooks/queries/useOccasion';
 
 const ParticipantsPage = () => {
   const { occasionCode } = useParams<{ occasionCode: string }>();
@@ -21,7 +20,7 @@ const ParticipantsPage = () => {
 
   const { data: participants, isLoading, error } = useParticipants(occasionCode!);
   const { mutate: createParticipant } = useCreateParticipant();
-  const { mutate: updateParticipant } = useUpdateParticipant();
+  //const { mutate: updateParticipant } = useUpdateParticipant();
   const { mutate: deleteParticipant } = useDeleteParticipant();
   const { filters, actions: { setFilters } } = useParticipantsStore();
 
