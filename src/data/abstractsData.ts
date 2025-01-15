@@ -1,4 +1,4 @@
-import { Abstract } from '@/types/abstract';
+import { Abstract } from '@/features/abstract/types/abstract';
 
 export const abstracts: Abstract[] = [
   {

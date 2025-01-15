@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { LeadCapture } from '@/types/exhibitions';
+import { LeadCapture } from '@/features/exhibition/types/exhibitions';
 
 interface LeadCaptureState {
   leads: LeadCapture[];

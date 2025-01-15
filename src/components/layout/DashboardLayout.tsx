@@ -18,7 +18,7 @@ import {
 import { UserRole } from '@/types/auth';
 import Logo from '@/components/common/Logo';
 import ThemeToggle from '@/components/common/ThemeToggle';
-import { useOccasionsStore } from '@/store/occasionsStore';
+import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
 import { useAuthStore, AuthStatus } from '@/store/authStore';
 import clsx from 'clsx';
 

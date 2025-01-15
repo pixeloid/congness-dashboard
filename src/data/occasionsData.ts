@@ -1,4 +1,4 @@
-import { Occasion } from '../types/occasions';
+import { Occasion } from '../features/occasion/types/occasions';
 
 export const occasions: Occasion[] = [
   {

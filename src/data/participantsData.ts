@@ -1,4 +1,4 @@
-import { Participant } from '../types/participants';
+import { Participant } from '../features/participant/types/participants';
 
 export const participants: Participant[] = [
   {
