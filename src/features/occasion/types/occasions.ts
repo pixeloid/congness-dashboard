@@ -20,6 +20,7 @@ export interface Contact {
 // Core Occasion type that connects all related entities
 export interface Occasion {
   id: number;
+  code?: string;
   name: string;
   subtitle?: string;
   description?: string;
@@ -28,8 +29,8 @@ export interface Occasion {
   type: 'conference' | 'workshop' | 'training' | 'seminar';
   startDate: string;
   endDate: string;
-  venue: Venue;
-  contact: Contact;
+  venue?: Venue;
+  contact?: Contact;
 
   // Related entities
   schedule?: {

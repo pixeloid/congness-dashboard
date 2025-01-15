@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { occasions as initialOccasions } from '@/data/occasionsData';
 import { Occasion, Venue } from '@/features/occasion/types/occasions';
+import { occasionsService } from '@/features/occasion/service/occasionsService';
 
 interface OccasionsState {
   occasions: Occasion[];
@@ -18,9 +18,11 @@ interface OccasionsState {
   };
 }
 
+
 export const useOccasionsStore = create<OccasionsState>()(
+
   immer((set) => ({
-    occasions: initialOccasions,
+    occasions: [],
     isLoading: false,
     error: null,
     selectedOccasion: null,
@@ -51,7 +53,7 @@ export const useOccasionsStore = create<OccasionsState>()(
         set((state) => {
           const occasion = state.occasions.find(o => o.id === occasionId);
           if (occasion) {
-            occasion.venue = { ...occasion.venue, ...updates };
+            occasion.venue = { ...occasion.venue!, ...updates };
           }
         });
       },
@@ -64,8 +66,8 @@ export const useOccasionsStore = create<OccasionsState>()(
         set({ isLoading: true, error: null });
         try {
           // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          set({ occasions: initialOccasions, isLoading: false });
+          const occasions = await occasionsService.getOccasions();
+          set({ occasions, isLoading: false });
         } catch (error) {
           set({ error: 'Failed to fetch occasions', isLoading: false });
         }
@@ -73,3 +75,5 @@ export const useOccasionsStore = create<OccasionsState>()(
     },
   }))
 );
+
+

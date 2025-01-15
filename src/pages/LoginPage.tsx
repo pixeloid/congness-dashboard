@@ -4,6 +4,7 @@ import Logo from '@/components/common/Logo';
 import { useAuthStore, AuthStatus } from '@/store/authStore';
 
 
+
 const quickLoginUsers = [
   {
     name: "Event Manager",
@@ -30,8 +31,8 @@ const quickLoginUsers = [
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('emese.veres@ementin.hu');
+  const [password, setPassword] = useState((import.meta as any).env.VITE_LOGIN_PASSWORD || '');
 
   const { authStatus, error, actions } = useAuthStore();
   const isLoading = authStatus === AuthStatus.LOADING;

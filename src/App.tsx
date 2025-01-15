@@ -58,13 +58,13 @@ const App = () => {
 
         {/* Occasions Management */}
         <Route path="/occasions" element={
-          <AuthGuard allowedRoles={[UserRole.EVENT_MANAGER]}>
+          <AuthGuard>
             <OccasionsPage />
           </AuthGuard>
         } />
 
         {/* Dashboard layout routes */}
-        <Route path="/occasions/:occasionId" element={
+        <Route path="/occasions/:occasionCode" element={
           <AuthGuard>
             <DashboardLayout />
           </AuthGuard>

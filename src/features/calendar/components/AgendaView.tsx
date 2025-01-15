@@ -69,14 +69,17 @@ const AgendaView: React.FC<AgendaViewProps> = ({ occasions, onSelectEvent }) => 
                           {format(parseISO(event.startDate), 'PPP', { locale: hu })}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <MapPinIcon className="h-5 w-5 text-accent" />
-                        <span>{event.venue.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <UserIcon className="h-5 w-5 text-accent" />
-                        <span>{event.contact.name}</span>
-                      </div>
+                      {event.venue &&
+                        <div className="flex items-center gap-2">
+                          <MapPinIcon className="h-5 w-5 text-accent" />
+                          <span>{event.venue.name}</span>
+                        </div>}
+                      {event.contact &&
+                        <div className="flex items-center gap-2">
+                          <UserIcon className="h-5 w-5 text-accent" />
+                          <span>{event.contact.name}</span>
+                        </div>
+                      }
                       <div className="flex items-center gap-2">
                         <ArrowTopRightOnSquareIcon className="h-5 w-5 text-accent" />
                         <span>View Details</span>

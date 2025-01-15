@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
 import { AnimatePresence } from 'framer-motion';
 import {
@@ -23,11 +23,13 @@ import MonthView from '../components/MonthView';
 import WeekView from '../components/WeekView';
 import AgendaView from '../components/AgendaView';
 import EventDetails from '../components/EventDetails';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 type ViewType = 'month' | 'week' | 'agenda';
 
 const CalendarPage = () => {
-    const { occasions } = useOccasionsStore();
+    const { occasions, actions, isLoading, error } = useOccasionsStore();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [viewType, setViewType] = useState<ViewType>('month');
     const [selectedEvent, setSelectedEvent] = useState<Occasion | null>(null);
@@ -49,6 +51,15 @@ const CalendarPage = () => {
     // Navigation handlers
     const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+
+    // actions.fetchOccasions() on initial render
+    useEffect(() => {
+        actions.fetchOccasions();
+    }, [actions]);
+
+    if (isLoading) return <LoadingSpinner />;
+    if (error) return <ErrorMessage message={error} />;
+
 
     return (
         <div className=" bg-gradient-to-br from-navy-dark to-navy p-8">

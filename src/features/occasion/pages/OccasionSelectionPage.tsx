@@ -1,18 +1,18 @@
 import { useNavigate } from 'react-router-dom';
-import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import Logo from '@/components/common/Logo';
 import { PencilIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import { useOccasions } from '@/features/occasion/hooks/queries/useOccasion';
 
 const OccasionSelectionPage = () => {
   const navigate = useNavigate();
-  const { occasions, isLoading, error } = useOccasionsStore();
-
+  const { data: occasions, isLoading, error } = useOccasions();
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error} />;
+  if (error) return <ErrorMessage message={error instanceof Error ? error.message : 'Error loading occasions'} />;
+  if (!occasions) return null;
 
   return (
     <div className="min-h-screen bg-background-dark p-8">
@@ -31,7 +31,7 @@ const OccasionSelectionPage = () => {
             >
               <div className="flex justify-between items-start">
                 <div
-                  onClick={() => navigate(`/occasions/${occasion.id}/dashboard`)}
+                  onClick={() => navigate(`/occasions/${occasion.code}/dashboard`)}
                   className="flex-1"
                 >
                   <h2 className="text-xl font-display font-semibold text-white mb-2">
@@ -48,7 +48,7 @@ const OccasionSelectionPage = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/occasions/${occasion.id}/details`);
+                    navigate(`/occasions/${occasion.code}/details`);
                   }}
                   className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                 >

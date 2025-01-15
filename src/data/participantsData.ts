@@ -3,7 +3,8 @@ import { Participant } from '../features/participant/types/participants';
 export const participants: Participant[] = [
   {
     id: 1,
-    name: "Dr. Nagy János",
+    firstName: "Dr. Nagy",
+    lastName: "János",
     email: "nagy.janos@example.com",
     title: "PhD",
     organization: "Semmelweis Egyetem",
@@ -16,7 +17,8 @@ export const participants: Participant[] = [
   },
   {
     id: 2,
-    name: "Kiss Éva",
+    firstName: "Éva",
+    lastName: "Kiss",
     email: "kiss.eva@example.com",
     title: "MSc",
     organization: "Tech Solutions Kft",
@@ -27,7 +29,8 @@ export const participants: Participant[] = [
   },
   {
     id: 3,
-    name: "Kovács Péter",
+    firstName: "Kovács",
+    lastName: "Péter",
     email: "kovacs.peter@example.com",
     organization: "Innovációs Központ",
     role: "organizer",

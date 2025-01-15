@@ -15,14 +15,14 @@ const OccasionCard: React.FC<OccasionCardProps> = ({ occasion, onEdit, onDetails
   return (
     <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 hover:border-accent/30 transition-all duration-300">
       <div className="relative h-48 rounded-t-xl overflow-hidden">
-        <img
+        {occasion.venue && (<img
           src={occasion.venue.photo}
           alt={occasion.venue.name}
           className="w-full h-full object-cover"
           onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
             e.currentTarget.src = 'https://via.placeholder.com/800x400?text=No+Image';
           }}
-        />
+        />)}
         <div className="absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent" />
         <h3 className="absolute bottom-4 left-4 right-4 text-xl font-display font-semibold text-white">
           {occasion.name}
@@ -31,7 +31,7 @@ const OccasionCard: React.FC<OccasionCardProps> = ({ occasion, onEdit, onDetails
 
       <div className="p-6 space-y-4">
         <DateRange startDate={occasion.startDate} endDate={occasion.endDate} />
-        <VenueInfo venue={occasion.venue} />
+        {occasion.venue && <VenueInfo venue={occasion.venue} />}
 
         <div className="pt-4 grid grid-cols-2 gap-2">
           <button

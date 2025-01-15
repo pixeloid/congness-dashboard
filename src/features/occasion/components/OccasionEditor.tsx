@@ -18,18 +18,18 @@ const OccasionEditor: React.FC<OccasionEditorProps> = ({ occasion, onSave }) => 
         startDate: format(new Date(occasion.startDate), 'yyyy-MM-dd'),
         endDate: format(new Date(occasion.endDate), 'yyyy-MM-dd'),
         venue: {
-            name: occasion.venue.name,
-            address: occasion.venue.address,
-            description: occasion.venue.description,
-            url: occasion.venue.url,
+            name: occasion.venue!.name,
+            address: occasion.venue!.address,
+            description: occasion.venue!.description,
+            url: occasion.venue!.url,
             coordinates: {
-                lat: occasion.venue.coordinates.lat,
-                lng: occasion.venue.coordinates.lng
+                lat: occasion.venue!.coordinates.lat,
+                lng: occasion.venue!.coordinates.lng
             }
         },
         contact: {
-            name: occasion.contact.name,
-            email: occasion.contact.email
+            name: occasion.contact!.name,
+            email: occasion.contact!.email
         }
     });
 
@@ -39,7 +39,7 @@ const OccasionEditor: React.FC<OccasionEditorProps> = ({ occasion, onSave }) => 
             ...formData,
             venue: {
                 ...formData.venue,
-                photo: occasion.venue.photo // Preserve existing photo
+                photo: occasion.venue!.photo // Preserve existing photo
             }
         });
         setIsEditing(false);
@@ -102,47 +102,48 @@ const OccasionEditor: React.FC<OccasionEditorProps> = ({ occasion, onSave }) => 
                         <h2 className="text-xl font-display font-semibold text-white mb-4">
                             Venue Information
                         </h2>
-                        <div className="space-y-4">
-                            <div className="flex items-start gap-2">
-                                <MapPinIcon className="h-5 w-5 flex-shrink-0 text-accent mt-1" />
-                                <div>
-                                    <p className="font-medium text-white">{occasion.venue.name}</p>
-                                    <p className="text-white/70">{occasion.venue.address}</p>
+                        {occasion.venue && (
+                            <div className="space-y-4">
+                                <div className="flex items-start gap-2">
+                                    <MapPinIcon className="h-5 w-5 flex-shrink-0 text-accent mt-1" />
+                                    <div>
+                                        <p className="font-medium text-white">{occasion.venue.name}</p>
+                                        <p className="text-white/70">{occasion.venue.address}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-white/70">Description</label>
-                                <p className="text-white mt-1">{occasion.venue.description}</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <GlobeAltIcon className="h-5 w-5 text-accent" />
-                                <a
-                                    href={occasion.venue.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-accent hover:text-accent-light"
-                                >
-                                    {new URL(occasion.venue.url).hostname}
-                                </a>
-                            </div>
-                        </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-white/70">Description</label>
+                                    <p className="text-white mt-1">{occasion.venue.description}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <GlobeAltIcon className="h-5 w-5 text-accent" />
+                                    <a
+                                        href={occasion.venue.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-accent hover:text-accent-light"
+                                    >
+                                        {new URL(occasion.venue.url).hostname}
+                                    </a>
+                                </div>
+                            </div>)}
                     </div>
 
                     {/* Contact Info */}
                     <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6">
                         <h2 className="text-xl font-display font-semibold text-white mb-4">
                             Contact Information
-                        </h2>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-white/70">Name</label>
-                                <p className="text-white mt-1">{occasion.contact.name}</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-white/70">Email</label>
-                                <p className="text-white mt-1">{occasion.contact.email}</p>
-                            </div>
-                        </div>
+                        </h2>{occasion.contact && (
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-white/70">Name</label>
+                                    <p className="text-white mt-1">{occasion.contact.name}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-white/70">Email</label>
+                                    <p className="text-white mt-1">{occasion.contact.email}</p>
+                                </div>
+                            </div>)}
                     </div>
                 </div>
             </div>

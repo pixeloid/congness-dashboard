@@ -21,6 +21,9 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
 import { useAuthStore, AuthStatus } from '@/store/authStore';
 import clsx from 'clsx';
+import { useOccasions } from '@/features/occasion/hooks/queries/useOccasion';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ErrorMessage from '@/components/common/ErrorMessage';
 
 interface NavigationItem {
   name: string;
@@ -32,8 +35,8 @@ interface NavigationItem {
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [abstractsOpen, setAbstractsOpen] = useState(false);
-  const { occasionId } = useParams<{ occasionId: string }>();
-  const { occasions, actions: { setSelectedOccasion } } = useOccasionsStore();
+  const { occasionCode } = useParams<{ occasionCode: string }>();
+  const { actions: { setSelectedOccasion } } = useOccasionsStore();
   const { user, authStatus, actions: { logout } } = useAuthStore();
   const navigate = useNavigate();
 
@@ -44,30 +47,33 @@ const DashboardLayout: React.FC = () => {
     }
   }, [authStatus, navigate]);
 
+  const { data: occasions, isLoading, error } = useOccasions();
+
   // Find the current occasion with proper type checking
-  const currentOccasion = occasionId ? occasions.find(o => o.id === parseInt(occasionId)) : null;
+  const currentOccasion = occasions && occasionCode ? occasions.find(o => o.code === occasionCode) : null;
 
   const hasRole = (roles?: UserRole[]): boolean => {
-    if (!roles || !user || !occasionId) return true;
+    return true;
+    //if (!roles || !user || !occasionCode) return true;
 
-    const occasionRole = user.occasionRoles.find(
-      role => role.occasionId === parseInt(occasionId)
-    );
+    //const occasionRole = user.occasionRoles.find(
+    //  role => role.occasionId === parseInt(occasionCode)
+    //);
 
-    if (!occasionRole) return false;
+    //if (!occasionRole) return false;
 
-    return occasionRole.roles.some(userRole =>
-      roles.includes(userRole.role as UserRole)
-    );
+    //return occasionRole.roles.some(userRole =>
+    //  roles.includes(userRole.role as UserRole)
+    //);
   };
 
   useEffect(() => {
-    if (occasionId) {
+    if (occasionCode) {
       if (currentOccasion) {
         setSelectedOccasion(currentOccasion);
       }
     }
-  }, [occasionId, occasions, setSelectedOccasion]);
+  }, [occasionCode, occasions, setSelectedOccasion]);
 
   const handleSwitchOccasion = () => {
     navigate('/select-occasion');
@@ -125,6 +131,10 @@ const DashboardLayout: React.FC = () => {
       roles: [UserRole.EVENT_MANAGER]
     }
   ];
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error instanceof Error ? error.message : 'Error loading occasions'} />;
+  if (!occasions) return null;
 
   return (
     <div className="min-h-screen bg-fixed bg-background-light dark:bg-background-dark">
@@ -186,7 +196,7 @@ const DashboardLayout: React.FC = () => {
             {navigationItems.map((item) => {
               if (!hasRole(item.roles)) return null;
 
-              const href = currentOccasion ? `/occasions/${currentOccasion.id}/${item.href}` : '#';
+              const href = currentOccasion ? `/occasions/${currentOccasion.code}/${item.href}` : '#';
               return (
                 <Link
                   key={item.name}

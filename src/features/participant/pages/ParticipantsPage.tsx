@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useParticipantsStore } from '@/features/participant/store/participantsStore';
 import ParticipantStatusBadge from '@/features/participant/components/ParticipantStatusBadge';
 import ParticipantRoleBadge from '@/features/participant/components/ParticipantRoleBadge';
 import ParticipantFilters from '@/features/participant/components/ParticipantFilters';
@@ -11,41 +10,32 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import { UserPlusIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
+import { useCreateParticipant, useDeleteParticipant, useParticipants, useUpdateParticipant } from '@/features/participant/hooks/queries/useParticipant';
+import { useParticipantsStore } from '@/features/participant/store/participantsStore';
+import { useCreateOccasion } from '@/features/occasion/hooks/queries/useOccasion';
 
 const ParticipantsPage = () => {
-  const { occasionId } = useParams<{ occasionId: string }>();
+  const { occasionCode } = useParams<{ occasionCode: string }>();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  const {
-    participants,
-    filters,
-    isLoading,
-    error,
-    actions: {
-      fetchParticipants,
-      setFilters,
-      addParticipant,
-      deleteParticipant
-    }
-  } = useParticipantsStore();
-
-  useEffect(() => {
-    if (occasionId) {
-      fetchParticipants(parseInt(occasionId, 10));
-    }
-  }, [occasionId, fetchParticipants]);
+  const { data: participants, isLoading, error } = useParticipants(occasionCode!);
+  const { mutate: createParticipant } = useCreateParticipant();
+  const { mutate: updateParticipant } = useUpdateParticipant();
+  const { mutate: deleteParticipant } = useDeleteParticipant();
+  const { filters, actions: { setFilters } } = useParticipantsStore();
 
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error} />;
+  if (error) return <ErrorMessage message={error.message} />;
 
-  const filteredParticipants = participants.filter(participant => {
+  const filteredParticipants = participants && participants.filter(participant => {
     if (filters.role && participant.role !== filters.role) return false;
     if (filters.status && participant.status !== filters.status) return false;
     if (filters.search) {
       const search = filters.search.toLowerCase();
       return (
-        participant.name.toLowerCase().includes(search) ||
+        participant.firstName.toLowerCase().includes(search) ||
+        participant.lastName.toLowerCase().includes(search) ||
         participant.email.toLowerCase().includes(search)
       );
     }
@@ -93,11 +83,11 @@ const ParticipantsPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10">
-              {filteredParticipants.map((participant) => (
-                <tr key={participant.id} className="hover:bg-white/5">
+              {filteredParticipants && filteredParticipants.map((participant) => (
+                <tr key={participant.code} className="hover:bg-white/5">
                   <td className="px-6 py-4">
                     <div>
-                      <div className="font-medium text-white">{participant.name}</div>
+                      <div className="font-medium text-white">{`${participant.lastName} ${participant.firstName}`}</div>
                       {participant.organization && (
                         <div className="text-sm text-white/70">{participant.organization}</div>
                       )}
@@ -118,7 +108,7 @@ const ParticipantsPage = () => {
                       Szerkesztés
                     </button>
                     <button
-                      onClick={() => deleteParticipant(participant.id)}
+                      onClick={() => deleteParticipant(participant.code!)}
                       className="px-3 py-1 text-sm bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors"
                     >
                       Törlés
@@ -135,7 +125,7 @@ const ParticipantsPage = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={(participant) => {
-          addParticipant({
+          createParticipant({
             ...participant,
             registrationDate: new Date().toISOString()
           });
@@ -147,7 +137,7 @@ const ParticipantsPage = () => {
         onClose={() => setIsImportModalOpen(false)}
         onImport={(participants) => {
           participants.forEach(participant => {
-            addParticipant({
+            createParticipant({
               ...participant,
               registrationDate: new Date().toISOString()
             });

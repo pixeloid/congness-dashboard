@@ -163,11 +163,11 @@ const TimelinePage = () => {
                                                                         <span>
                                                                             {duration} {duration === 1 ? 'day' : 'days'}
                                                                         </span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-1">
-                                                                        <MapPinIcon className="h-4 w-4" />
-                                                                        <span>{event.venue.name}</span>
-                                                                    </div>
+                                                                    </div>{
+                                                                        event.venue && <div className="flex items-center gap-1">
+                                                                            <MapPinIcon className="h-4 w-4" />
+                                                                            <span>{event.venue.name}</span>
+                                                                        </div>}
                                                                 </div>
 
                                                                 {/* Overlapping events indicator */}
@@ -275,34 +275,37 @@ const TimelinePage = () => {
                                     <h3 className="text-sm font-medium text-navy/60 dark:text-white/60 mb-2">
                                         Venue
                                     </h3>
-                                    <div className="bg-navy/5 dark:bg-white/5 rounded-lg p-4">
-                                        <div className="flex items-start gap-3">
-                                            <MapPinIcon className="h-5 w-5 text-accent flex-shrink-0 mt-1" />
-                                            <div>
-                                                <div className="font-medium text-navy dark:text-white">
-                                                    {selectedEvent.venue.name}
+                                    {selectedEvent.venue && (
+                                        <div className="bg-navy/5 dark:bg-white/5 rounded-lg p-4">
+                                            <div className="flex items-start gap-3">
+                                                <MapPinIcon className="h-5 w-5 text-accent flex-shrink-0 mt-1" />
+                                                <div>
+                                                    <div className="font-medium text-navy dark:text-white">
+                                                        {selectedEvent.venue.name}
+                                                    </div>
+                                                    <div className="text-sm text-navy/70 dark:text-white/70">
+                                                        {selectedEvent.venue.address}
+                                                    </div>
+                                                    <p className="text-sm text-navy/70 dark:text-white/70 mt-2">
+                                                        {selectedEvent.venue.description}
+                                                    </p>
                                                 </div>
-                                                <div className="text-sm text-navy/70 dark:text-white/70">
-                                                    {selectedEvent.venue.address}
-                                                </div>
-                                                <p className="text-sm text-navy/70 dark:text-white/70 mt-2">
-                                                    {selectedEvent.venue.description}
-                                                </p>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
 
                                 <div>
                                     <h3 className="text-sm font-medium text-navy/60 dark:text-white/60 mb-2">
                                         Contact
                                     </h3>
-                                    <div className="text-navy dark:text-white">
+                                    {selectedEvent.contact && <div className="text-navy dark:text-white">
                                         <div className="font-medium">{selectedEvent.contact.name}</div>
                                         <div className="text-sm text-navy/70 dark:text-white/70">
                                             {selectedEvent.contact.email}
                                         </div>
                                     </div>
+                                    }
                                 </div>
 
                                 <a

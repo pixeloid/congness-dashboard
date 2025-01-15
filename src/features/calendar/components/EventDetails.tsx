@@ -78,7 +78,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, onClose }) => {
                         <div className="bg-navy/5 dark:bg-white/5 rounded-lg p-4">
                             <div className="flex items-start gap-3">
                                 <ViewColumnsIcon className="h-5 w-5 text-accent flex-shrink-0 mt-1" />
-                                <div>
+                                {event.venue && (<div>
                                     <div className="font-medium text-navy dark:text-white">
                                         {event.venue.name}
                                     </div>
@@ -88,7 +88,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, onClose }) => {
                                     <p className="text-sm text-navy/70 dark:text-white/70 mt-2">
                                         {event.venue.description}
                                     </p>
-                                </div>
+                                </div>)}
                             </div>
                         </div>
                     </div>
@@ -97,12 +97,13 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, onClose }) => {
                         <h3 className="text-sm font-medium text-navy/60 dark:text-white/60 mb-2">
                             Contact
                         </h3>
-                        <div className="text-navy dark:text-white">
-                            <div className="font-medium">{event.contact.name}</div>
-                            <div className="text-sm text-navy/70 dark:text-white/70">
-                                {event.contact.email}
-                            </div>
-                        </div>
+                        {event.contact && (
+                            <div className="text-navy dark:text-white">
+                                <div className="font-medium">{event.contact.name}</div>
+                                <div className="text-sm text-navy/70 dark:text-white/70">
+                                    {event.contact.email}
+                                </div>
+                            </div>)}
                     </div>
 
                     <a

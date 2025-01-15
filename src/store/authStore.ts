@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { persist } from 'zustand/middleware';
 import { User, UserRole } from '@/types/auth';
+import api from '@/api/api';
 
 export enum AuthStatus {
   LOADING = 'loading',
@@ -129,21 +130,24 @@ export const useAuthStore = create<AuthStore>()(
           set({ authStatus: AuthStatus.LOADING, error: null });
           try {
             // Find user immediately for quick login
-            const user = mockUsers.find(u => u.email === email);
-            if (!user) {
-              throw new Error('Invalid credentials');
-            }
+            // const user = mockUsers.find(u => u.email === email);
+            // if (!user) {
+            //   throw new Error('Invalid credentials');
+            // }
 
             // Simulate minimal delay for UI feedback
-            await new Promise(resolve => setTimeout(resolve, 300));
+            const { token } = (await api.post(
+              (import.meta as any).env.VITE_API_AUTH_URL,
+              { email, password: _password })).data;
 
-            // Generate mock token (in real app this would come from backend)
-            const token = btoa(JSON.stringify({
-              userId: user.id,
-              email: user.email,
-              exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
-            }));
+            const tokenData = JSON.parse(atob(token.split('.')[1]));
 
+            const user: User = {
+              email: tokenData.username,
+              id: tokenData.userId,
+              name: tokenData.username,
+              occasionRoles: tokenData.roles
+            }
             set({
               user,
               token,
@@ -182,10 +186,12 @@ export const useAuthStore = create<AuthStore>()(
             }
 
             // Decode and validate token
-            const tokenData = JSON.parse(atob(state.token));
+            const tokenData = JSON.parse(atob(state.token.split('.')[1]));
 
-            // Check if token is expired
-            if (tokenData.exp < Date.now()) {
+            const now = Date.now() / 1000;
+            if (tokenData.exp < now) {
+              // print expiry time offset
+              console.log(tokenData.exp, now);
               set({
                 user: null,
                 token: null,
@@ -194,19 +200,14 @@ export const useAuthStore = create<AuthStore>()(
               });
               return false;
             }
-
-            // Find user from token
-            const user = mockUsers.find(u => u.id === tokenData.userId);
-            if (!user) {
-              set({
-                user: null,
-                token: null,
-                authStatus: AuthStatus.UNAUTHENTICATED,
-                error: 'User not found'
-              });
-              return false;
+            const user: User = {
+              email: tokenData.username,
+              id: tokenData.userId,
+              name: tokenData.username,
+              occasionRoles: tokenData.roles
             }
 
+            // Find user from token
             set({
               user,
               authStatus: AuthStatus.AUTHENTICATED,
@@ -241,3 +242,11 @@ export const useAuthStore = create<AuthStore>()(
     })
   })
 );
+
+
+const useAuthToken = () => {
+  const token = useAuthStore((state) => state.token);
+  return token;
+};
+
+export default useAuthToken;

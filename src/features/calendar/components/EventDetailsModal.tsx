@@ -31,8 +31,8 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ events, onClose }
                         >
                             <p className="font-semibold">{event.name}</p>
                             <p className="text-xs">{event.description}</p>
-                            <p className="text-xs">{format(parseISO(event.startDate), 'PPP', { locale: hu })} at {event.venue.name}</p>
-                            <p className="text-xs">{event.venue.address}</p>
+                            {event.venue && <p className="text-xs">{format(parseISO(event.startDate), 'PPP', { locale: hu })} at {event.venue.name}</p>}
+                            {event.venue && <p className="text-xs">{event.venue.address}</p>}
                         </div>
                     ))}
                 </div>

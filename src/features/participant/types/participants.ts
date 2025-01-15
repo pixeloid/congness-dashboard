@@ -1,6 +1,8 @@
 export interface Participant {
   id: number;
-  name: string;
+  code?: string;
+  firstName: string;
+  lastName: string;
   email: string;
   title?: string;
   organization?: string;

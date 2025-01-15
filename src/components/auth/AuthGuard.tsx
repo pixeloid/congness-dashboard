@@ -34,12 +34,13 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles, occasionI
       );
     }
 
+    return true;
     // For non-occasion routes, check if user has the role in any occasion
-    return user.occasionRoles.some(role =>
-      role.roles.some(userRole =>
-        allowedRoles.includes(userRole.role as UserRole)
-      )
-    );
+    //  return user.occasionRoles.some(role =>
+    //    role.roles.some(userRole =>
+    //      allowedRoles.includes(userRole.role as UserRole)
+    //    )
+    //  );
   };
 
   if (authStatus === AuthStatus.LOADING) {

@@ -9,7 +9,8 @@ interface AddParticipantModalProps {
 }
 
 const AddParticipantModal: React.FC<AddParticipantModalProps> = ({ isOpen, onClose, onAdd }) => {
-  const [name, setName] = useState('');
+  const [firstName, setFirstname] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [title, setTitle] = useState('');
   const [organization, setOrganization] = useState('');
@@ -20,7 +21,8 @@ const AddParticipantModal: React.FC<AddParticipantModalProps> = ({ isOpen, onClo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAdd({
-      name,
+      firstName,
+      lastName,
       email,
       title,
       organization,
@@ -48,12 +50,25 @@ const AddParticipantModal: React.FC<AddParticipantModalProps> = ({ isOpen, onClo
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-white/70 mb-1">
-                Név
+                Vezetéknév
               </label>
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1">
+                Keresztnév
+              </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstname(e.target.value)}
                 className="w-full px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white"
                 required
               />

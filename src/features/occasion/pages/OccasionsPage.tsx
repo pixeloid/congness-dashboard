@@ -1,17 +1,19 @@
 import { useNavigate } from 'react-router-dom';
-import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { PlusIcon, PencilIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { useCreateOccasion, useOccasions } from '@/features/occasion/hooks/queries/useOccasion';
 
 const OccasionsPage = () => {
   const navigate = useNavigate();
-  const { occasions, isLoading, error, actions } = useOccasionsStore();
+  const { data: occasions, isLoading, error } = useOccasions();
+  const createOccasion = useCreateOccasion();
 
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error} />;
+  if (error) return <ErrorMessage message={error instanceof Error ? error.message : 'Error loading occasions'} />;
+  if (!occasions) return null;
 
   return (
     <div className="p-6 space-y-8">
@@ -21,7 +23,7 @@ const OccasionsPage = () => {
           <p className="text-lg text-white/70">Manage all occasions and events</p>
         </div>
         <button
-          onClick={() => actions.addOccasion({
+          onClick={() => createOccasion.mutate({
             name: 'New Occasion',
             startDate: new Date().toISOString(),
             endDate: new Date().toISOString(),
@@ -65,10 +67,11 @@ const OccasionsPage = () => {
                     {format(new Date(occasion.startDate), 'yyyy. MMMM d.', { locale: hu })} -
                     {format(new Date(occasion.endDate), 'yyyy. MMMM d.', { locale: hu })}
                   </span>
-                  <div className="flex items-center gap-2">
+                  {occasion.venue && <div className="flex items-center gap-2">
                     <MapPinIcon className="h-4 w-4" />
                     <span>{occasion.venue.name}</span>
                   </div>
+                  }
                 </div>
               </div>
               <div className="flex gap-4">

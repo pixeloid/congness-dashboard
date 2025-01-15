@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
 import { format, isAfter, isBefore } from 'date-fns';
 import { hu } from 'date-fns/locale';
@@ -10,6 +10,8 @@ import {
     MagnifyingGlassIcon,
     AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ErrorMessage from '@/components/common/ErrorMessage';
 
 // Event type categories with their colors
 const eventTypes = {
@@ -20,7 +22,7 @@ const eventTypes = {
 };
 
 const EventsPage = () => {
-    const { occasions } = useOccasionsStore();
+    const { occasions, actions, error, isLoading } = useOccasionsStore();
     const [filters, setFilters] = useState({
         search: '',
         type: '',
@@ -39,7 +41,7 @@ const EventsPage = () => {
         if (filters.search && !occasion.name.toLowerCase().includes(filters.search.toLowerCase())) {
             return false;
         }
-        if (filters.location && occasion.venue.address.toLowerCase().includes(filters.location.toLowerCase())) {
+        if (filters.location && occasion.venue!.address.toLowerCase().includes(filters.location.toLowerCase())) {
             return false;
         }
         if (filters.dateRange !== 'all') {
@@ -57,6 +59,14 @@ const EventsPage = () => {
         }
         return true;
     });
+
+    useEffect(() => {
+        actions.fetchOccasions();
+    }, [actions]);
+
+    if (isLoading) return <LoadingSpinner />;
+    if (error) return <ErrorMessage message={error} />;
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-navy-dark to-navy">
@@ -207,14 +217,18 @@ const EventsPage = () => {
                                             {format(new Date(occasion.startDate), 'PPP', { locale: hu })}
                                         </span>
                                     </div>
-                                    <div className="flex items-center text-navy/60 dark:text-white/60">
-                                        <MapPinIcon className="h-5 w-5 mr-2" />
-                                        <span className="text-sm">{occasion.venue.name}</span>
-                                    </div>
-                                    <div className="flex items-center text-navy/60 dark:text-white/60">
-                                        <BuildingOffice2Icon className="h-5 w-5 mr-2" />
-                                        <span className="text-sm">{occasion.venue.address}</span>
-                                    </div>
+                                    {occasion.venue && (
+                                        <>
+                                            <div className="flex items-center text-navy/60 dark:text-white/60">
+                                                <MapPinIcon className="h-5 w-5 mr-2" />
+                                                <span className="text-sm">{occasion.venue.name}</span>
+                                            </div>
+                                            <div className="flex items-center text-navy/60 dark:text-white/60">
+                                                <BuildingOffice2Icon className="h-5 w-5 mr-2" />
+                                                <span className="text-sm">{occasion.venue.address}</span>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
 
                                 {/* Action Button */}
@@ -223,16 +237,16 @@ const EventsPage = () => {
                                 </button>
                             </div>
 
-                            {/* Event Type Badge */}
-                            <div className="absolute top-4 right-4">
-                                <span className={`px-3 py-1 text-xs font-medium ${occasion.type === 'conference' ? 'bg-blue-500 text-white' :
-                                    occasion.type === 'workshop' ? 'bg-purple-500 text-white' :
-                                        occasion.type === 'training' ? 'bg-green-500 text-white' :
-                                            'bg-orange-500 text-white'
-                                    } rounded-full shadow-lg`}>
-                                    {occasion.type.charAt(0).toUpperCase() + occasion.type.slice(1)}
-                                </span>
-                            </div>
+                            {occasion.type && (
+                                <div className="absolute top-4 right-4">
+                                    <span className={`px-3 py-1 text-xs font-medium ${occasion.type === 'conference' ? 'bg-blue-500 text-white' :
+                                        occasion.type === 'workshop' ? 'bg-purple-500 text-white' :
+                                            occasion.type === 'training' ? 'bg-green-500 text-white' :
+                                                'bg-orange-500 text-white'
+                                        } rounded-full shadow-lg`}>
+                                        {occasion.type.charAt(0).toUpperCase() + occasion.type.slice(1)}
+                                    </span>
+                                </div>)}
                         </motion.div>
                     ))}
                 </div>
