@@ -18,7 +18,7 @@ interface AgendaViewProps {
 const AgendaView: React.FC<AgendaViewProps> = ({ occasions, onSelectEvent }) => {
   // Group events by month
   const groupedEvents = occasions.reduce((groups, event) => {
-    const monthKey = format(parseISO(event.startDate), 'yyyy-MM');
+    const monthKey = format(parseISO(event.date_start), 'yyyy-MM');
     if (!groups[monthKey]) {
       groups[monthKey] = [];
     }
@@ -37,7 +37,7 @@ const AgendaView: React.FC<AgendaViewProps> = ({ occasions, onSelectEvent }) => 
           <div className="space-y-4">
             {events.map((event) => (
               <button
-                key={event.id}
+                key={event['@id']}
                 onClick={() => onSelectEvent(event)}
                 className="w-full bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 text-left hover:border-accent/30 transition-all"
               >
@@ -53,7 +53,7 @@ const AgendaView: React.FC<AgendaViewProps> = ({ occasions, onSelectEvent }) => 
                           ? 'bg-green-500/20 text-green-500'
                           : 'bg-orange-500/20 text-orange-500'
                   )}>
-                    {format(parseISO(event.startDate), 'd', { locale: hu })}
+                    {format(parseISO(event.date_start), 'd', { locale: hu })}
                   </div>
 
                   <div className="flex-1">
@@ -66,7 +66,7 @@ const AgendaView: React.FC<AgendaViewProps> = ({ occasions, onSelectEvent }) => 
                       <div className="flex items-center gap-2">
                         <CalendarIcon className="h-5 w-5 text-accent" />
                         <span>
-                          {format(parseISO(event.startDate), 'PPP', { locale: hu })}
+                          {format(parseISO(event.date_start), 'PPP', { locale: hu })}
                         </span>
                       </div>
                       {event.venue &&

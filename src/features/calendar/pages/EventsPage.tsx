@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
-import { format, isAfter, isBefore } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -12,6 +11,8 @@ import {
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import { useOccasionService } from '@/features/occasion/hooks/queries/useOccasion';
+import Paginator from '@/components/common/Paginator';
 
 // Event type categories with their colors
 const eventTypes = {
@@ -22,7 +23,6 @@ const eventTypes = {
 };
 
 const EventsPage = () => {
-    const { occasions, actions, error, isLoading } = useOccasionsStore();
     const [filters, setFilters] = useState({
         search: '',
         type: '',
@@ -30,42 +30,16 @@ const EventsPage = () => {
         dateRange: 'all'
     });
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [page, setPage] = useState(1);
 
-    // Sort occasions by date
-    const sortedOccasions = [...occasions].sort((a, b) =>
-        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-    );
-
-    // Filter occasions based on user selections
-    const filteredOccasions = sortedOccasions.filter(occasion => {
-        if (filters.search && !occasion.name.toLowerCase().includes(filters.search.toLowerCase())) {
-            return false;
-        }
-        if (filters.location && occasion.venue!.address.toLowerCase().includes(filters.location.toLowerCase())) {
-            return false;
-        }
-        if (filters.dateRange !== 'all') {
-            const today = new Date();
-            const eventDate = new Date(occasion.startDate);
-            switch (filters.dateRange) {
-                case 'upcoming':
-                    return isAfter(eventDate, today);
-                case 'past':
-                    return isBefore(eventDate, today);
-                case 'thisMonth':
-                    return eventDate.getMonth() === today.getMonth() &&
-                        eventDate.getFullYear() === today.getFullYear();
-            }
-        }
-        return true;
-    });
+    const { data: occasions, error, isLoading, refetch } = useOccasionService.useList(filters, undefined, page);
 
     useEffect(() => {
-        actions.fetchOccasions();
-    }, [actions]);
+        refetch();
+    }, [filters, page, refetch]);
 
     if (isLoading) return <LoadingSpinner />;
-    if (error) return <ErrorMessage message={error} />;
+    if (error) return <ErrorMessage message={error.message} />;
 
 
     return (
@@ -178,9 +152,9 @@ const EventsPage = () => {
             {/* Events List */}
             <div className="max-w-7xl mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredOccasions.map((occasion, index) => (
+                    {occasions && occasions.items.map((occasion, index) => (
                         <motion.div
-                            key={occasion.id}
+                            key={occasion['@id']}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
@@ -211,12 +185,12 @@ const EventsPage = () => {
 
                                 {/* Event Details */}
                                 <div className="space-y-2">
-                                    <div className="flex items-center text-navy/60 dark:text-white/60">
+                                    {occasion.date_start && <div className="flex items-center text-navy/60 dark:text-white/60">
                                         <CalendarIcon className="h-5 w-5 mr-2" />
                                         <span className="text-sm">
-                                            {format(new Date(occasion.startDate), 'PPP', { locale: hu })}
+                                            {format(new Date(occasion.date_start), 'PPP', { locale: hu })}
                                         </span>
-                                    </div>
+                                    </div>}
                                     {occasion.venue && (
                                         <>
                                             <div className="flex items-center text-navy/60 dark:text-white/60">
@@ -250,6 +224,11 @@ const EventsPage = () => {
                         </motion.div>
                     ))}
                 </div>
+
+                <Paginator
+                    setPage={setPage}
+                    view={occasions!.view!}
+                />
             </div>
         </div>
     );

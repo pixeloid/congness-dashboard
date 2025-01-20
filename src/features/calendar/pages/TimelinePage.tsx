@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, isWithinInterval } from 'date-fns';
 import { hu } from 'date-fns/locale';
@@ -12,15 +11,16 @@ import {
     UserGroupIcon,
     XMarkIcon
 } from '@heroicons/react/24/outline';
+import { useOccasionService } from '@/features/occasion/hooks/queries/useOccasion';
 
 const TimelinePage = () => {
-    const { occasions } = useOccasionsStore();
     const [selectedEvent, setSelectedEvent] = useState<Occasion | null>(null);
     const [expandedMonth, setExpandedMonth] = useState<string | null>(null);
+    const { data: occasions } = useOccasionService.useList();
 
     // Group events by month
-    const groupedEvents = occasions.reduce((groups, event) => {
-        const monthKey = format(new Date(event.startDate), 'yyyy-MM');
+    const groupedEvents = occasions?.items.reduce((groups, event) => {
+        const monthKey = format(new Date(event.date_start), 'yyyy-MM');
         if (!groups[monthKey]) {
             groups[monthKey] = [];
         }
@@ -30,13 +30,13 @@ const TimelinePage = () => {
 
     // Check if events overlap
     const getOverlappingEvents = (event: Occasion, events: Occasion[]) => {
-        const eventStart = new Date(event.startDate);
-        const eventEnd = new Date(event.endDate);
+        const eventStart = new Date(event.date_start);
+        const eventEnd = new Date(event.date_end);
 
         return events.filter(otherEvent => {
-            if (otherEvent.id === event.id) return false;
-            const otherStart = new Date(otherEvent.startDate);
-            const otherEnd = new Date(otherEvent.endDate);
+            if (otherEvent['@id'] === event['@id']) return false;
+            const otherStart = new Date(otherEvent.date_start);
+            const otherEnd = new Date(otherEvent.date_end);
 
             return isWithinInterval(eventStart, { start: otherStart, end: otherEnd }) ||
                 isWithinInterval(eventEnd, { start: otherStart, end: otherEnd }) ||
@@ -46,12 +46,12 @@ const TimelinePage = () => {
 
     // Calculate event duration in days
     const getEventDuration = (event: Occasion) => {
-        const start = new Date(event.startDate);
-        const end = new Date(event.endDate);
+        const start = new Date(event.date_start);
+        const end = new Date(event.date_end);
         return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
     };
 
-    return (
+    return groupedEvents && (
         <div className="min-h-screen bg-gradient-to-br from-navy-dark to-navy p-8">
             <div className="max-w-6xl mx-auto">
                 {/* Timeline */}
@@ -85,7 +85,7 @@ const TimelinePage = () => {
                                     </div>
                                     {hasOverlappingEvents && (
                                         <span className="text-sm text-white/60">
-                                            {monthEvents.length} events ({monthEvents.length - new Set(monthEvents.map(e => e.startDate)).size} overlapping)
+                                            {monthEvents.length} events ({monthEvents.length - new Set(monthEvents.map(e => e.date_start)).size} overlapping)
                                         </span>
                                     )}
                                 </button>
@@ -105,15 +105,15 @@ const TimelinePage = () => {
                                                 const isLongEvent = duration > 2;
 
                                                 return (
-                                                    <div key={event.id} className="relative pl-32 pr-4">
+                                                    <div key={event['@id']} className="relative pl-32 pr-4">
                                                         {/* Date bubble */}
                                                         <div className="absolute left-32 -translate-x-full flex items-center gap-4">
                                                             <div className="text-right w-24">
                                                                 <div className="text-sm font-medium text-white">
-                                                                    {format(new Date(event.startDate), 'd', { locale: hu })}
+                                                                    {format(new Date(event.date_start), 'd', { locale: hu })}
                                                                 </div>
                                                                 <div className="text-xs text-white/60">
-                                                                    {format(new Date(event.startDate), 'EEEE', { locale: hu })}
+                                                                    {format(new Date(event.date_start), 'EEEE', { locale: hu })}
                                                                 </div>
                                                             </div>
                                                             <div className="w-4 h-4 rounded-full bg-white/10 border-2 border-accent" />
@@ -262,10 +262,10 @@ const TimelinePage = () => {
                                         <CalendarIcon className="h-5 w-5 text-accent" />
                                         <div>
                                             <div>
-                                                {format(new Date(selectedEvent.startDate), 'PPP', { locale: hu })} -
+                                                {format(new Date(selectedEvent.date_start), 'PPP', { locale: hu })} -
                                             </div>
                                             <div>
-                                                {format(new Date(selectedEvent.endDate), 'PPP', { locale: hu })}
+                                                {format(new Date(selectedEvent.date_end), 'PPP', { locale: hu })}
                                             </div>
                                         </div>
                                     </div>

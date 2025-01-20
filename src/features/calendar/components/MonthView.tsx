@@ -20,8 +20,8 @@ const MonthView: React.FC<MonthViewProps> = ({
 
     const getEventsForDay = (day: Date) => {
         return occasions.filter(event => {
-            const eventStart = parseISO(event.startDate);
-            const eventEnd = parseISO(event.endDate);
+            const eventStart = parseISO(event.date_start);
+            const eventEnd = parseISO(event.date_end);
             return isWithinInterval(day, { start: eventStart, end: eventEnd });
         });
     };
@@ -90,7 +90,7 @@ const MonthView: React.FC<MonthViewProps> = ({
                                 <div className="space-y-1">
                                     {dayEvents.slice(0, 3).map((event) => (
                                         <button
-                                            key={event.id}
+                                            key={event['@id']}
                                             onClick={() => onSelectEvent(event)}
                                             className={clsx(
                                                 'w-full px-2 py-1 rounded text-left text-xs truncate transition-colors',
@@ -135,7 +135,7 @@ const MonthView: React.FC<MonthViewProps> = ({
                         <div className="space-y-3">
                             {selectedDayEvents.map((event) => (
                                 <button
-                                    key={event.id}
+                                    key={event['@id']}
                                     onClick={() => {
                                         onSelectEvent(event);
                                         closeModal();

@@ -9,14 +9,14 @@ interface AbstractSubmissionState {
   isLoading: boolean;
   error: string | null;
   actions: {
-    fetchSubmissionProcess: (occasionId: number) => Promise<void>;
-    updateSubmissionProcess: (occasionId: number, updates: Partial<AbstractSubmissionProcess>) => Promise<void>;
-    fetchCategories: (occasionId: number) => Promise<void>;
-    fetchInvitations: (occasionId: number) => Promise<void>;
+    fetchSubmissionProcess: (code: number) => Promise<void>;
+    updateSubmissionProcess: (code: number, updates: Partial<AbstractSubmissionProcess>) => Promise<void>;
+    fetchCategories: (code: number) => Promise<void>;
+    fetchInvitations: (code: number) => Promise<void>;
     addCategory: (category: Omit<AbstractCategory, 'id'>) => void;
     updateCategory: (id: number, updates: Partial<AbstractCategory>) => void;
     deleteCategory: (id: number) => void;
-    sendInvitation: (email: string, occasionId: number) => Promise<void>;
+    sendInvitation: (email: string, code: number) => Promise<void>;
     resendInvitation: (id: number) => Promise<void>;
     validateInvitationToken: (token: string) => Promise<AbstractInvitation | null>;
     handleInvitationResponse: (token: string, accept: boolean) => Promise<void>;
@@ -93,7 +93,7 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
     isLoading: false,
     error: null,
     actions: {
-      fetchSubmissionProcess: async (occasionId) => {
+      fetchSubmissionProcess: async (code) => {
         set({ isLoading: true, error: null });
         try {
           // Simulate API call with shorter delay
@@ -101,7 +101,7 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
           set(state => {
             state.process = {
               id: 1,
-              occasionId,
+              occasionId: code,
               isPublic: false,
               startDate: "2025-01-01T00:00:00Z",
               submissionDeadline: "2025-01-25T23:59:59Z",
@@ -118,12 +118,12 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
           set({ error: 'Failed to fetch submission process', isLoading: false });
         }
       },
-      updateSubmissionProcess: async (occasionId: number, updates: Partial<AbstractSubmissionProcess>) => {
+      updateSubmissionProcess: async (code: number, updates: Partial<AbstractSubmissionProcess>) => {
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
           set(state => {
-            if (state.process && state.process.occasionId === occasionId) {
+            if (state.process && state.process.occasionId === code) {
               state.process = { ...state.process, ...updates };
             }
             state.isLoading = false;
@@ -146,12 +146,12 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
         }
       },
 
-      fetchInvitations: async (occasionId) => {
+      fetchInvitations: async (code) => {
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
           set(state => {
-            state.invitations = dummyInvitations.filter(i => i.occasionId === occasionId);
+            state.invitations = dummyInvitations.filter(i => i.occasionId === code);
             state.isLoading = false;
           });
         } catch (error) {
@@ -181,7 +181,7 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
         });
       },
 
-      sendInvitation: async (email, occasionId) => {
+      sendInvitation: async (email) => {
         set({ isLoading: true, error: null });
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
@@ -191,7 +191,7 @@ export const useAbstractSubmissionStore = create<AbstractSubmissionState>()(
               id: newId,
               email,
               token: `token-${newId}`,
-              occasionId,
+              occasionId: 1,
               categoryId: 1,
               status: 'pending',
               expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),

@@ -11,7 +11,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import { AbstractStatus } from '@/features/abstract/types/abstract';
 
 const AbstractsPage = () => {
-  const { occasionId } = useParams<{ occasionId: string }>();
+  const { occasionCode } = useParams<{ occasionCode: string }>();
   const navigate = useNavigate();
 
   const [filters, setFilters] = useState<{
@@ -34,13 +34,13 @@ const AbstractsPage = () => {
   } = useAbstractSubmissionStore();
 
   useEffect(() => {
-    if (occasionId) {
-      const id = parseInt(occasionId, 10);
+    if (occasionCode) {
+      const id = parseInt(occasionCode, 10);
       actions.fetchSubmissionProcess(id);
       fetchAbstracts(id);
       actions.fetchInvitations(id);
     }
-  }, [occasionId, actions, fetchAbstracts]);
+  }, [occasionCode, actions, fetchAbstracts]);
 
   const filteredAbstracts = abstracts.filter(abstract => {
     if (filters.status && abstract.status !== filters.status) return false;
@@ -73,7 +73,7 @@ const AbstractsPage = () => {
           <p className="text-lg text-white/70">Absztraktok és bírálatok kezelése</p>
         </div>
         <button
-          onClick={() => navigate(`/occasions/${occasionId}/abstracts/new`)}
+          onClick={() => navigate(`/occasions/${occasionCode}/abstracts/new`)}
           className="inline-flex items-center px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
         >
           <PlusIcon className="h-5 w-5 mr-2" />
@@ -102,7 +102,7 @@ const AbstractsPage = () => {
       <AbstractList
         abstracts={filteredAbstracts}
         onSelect={(abstract) => {
-          navigate(`/occasions/${occasionId}/abstracts/${abstract.id}`);
+          navigate(`/occasions/${occasionCode}/abstracts/${abstract.id}`);
         }}
       />
     </div>

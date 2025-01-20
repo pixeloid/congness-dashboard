@@ -22,7 +22,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ events, onClose }
                 <div className="space-y-3">
                     {events.map((event) => (
                         <div
-                            key={event.id}
+                            key={event['@id']}
                             className="p-3 rounded-lg border text-sm"
                             style={{
                                 borderColor: 'lightgray',
@@ -31,7 +31,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ events, onClose }
                         >
                             <p className="font-semibold">{event.name}</p>
                             <p className="text-xs">{event.description}</p>
-                            {event.venue && <p className="text-xs">{format(parseISO(event.startDate), 'PPP', { locale: hu })} at {event.venue.name}</p>}
+                            {event.venue && <p className="text-xs">{format(parseISO(event.date_start), 'PPP', { locale: hu })} at {event.venue.name}</p>}
                             {event.venue && <p className="text-xs">{event.venue.address}</p>}
                         </div>
                     ))}

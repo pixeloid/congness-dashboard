@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
+import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import {
     startOfMonth,
@@ -25,11 +24,12 @@ import AgendaView from '../components/AgendaView';
 import EventDetails from '../components/EventDetails';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { useOccasionService } from '@/features/occasion/hooks/queries/useOccasion';
 
 type ViewType = 'month' | 'week' | 'agenda';
 
 const CalendarPage = () => {
-    const { occasions, actions, isLoading, error } = useOccasionsStore();
+    const { data: occasions, isLoading, error } = useOccasionService.useList();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [viewType, setViewType] = useState<ViewType>('month');
     const [selectedEvent, setSelectedEvent] = useState<Occasion | null>(null);
@@ -52,16 +52,12 @@ const CalendarPage = () => {
     const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
 
-    // actions.fetchOccasions() on initial render
-    useEffect(() => {
-        actions.fetchOccasions();
-    }, [actions]);
 
     if (isLoading) return <LoadingSpinner />;
-    if (error) return <ErrorMessage message={error} />;
+    if (error) return <ErrorMessage message={error.message} />;
 
 
-    return (
+    return occasions && (
         <div className=" bg-gradient-to-br from-navy-dark to-navy p-8">
             <div className="max-w-7xl mx-auto">
                 {/* Calendar Header */}
@@ -139,7 +135,7 @@ const CalendarPage = () => {
                     <MonthView
                         currentDate={currentDate}
                         calendarDays={calendarDays}
-                        occasions={occasions}
+                        occasions={occasions.items}
                         onSelectEvent={setSelectedEvent}
                     />
                 )}
@@ -147,14 +143,14 @@ const CalendarPage = () => {
                 {viewType === 'week' && (
                     <WeekView
                         currentDate={currentDate}
-                        occasions={occasions}
+                        occasions={occasions.items}
                         onSelectEvent={setSelectedEvent}
                     />
                 )}
 
                 {viewType === 'agenda' && (
                     <AgendaView
-                        occasions={occasions}
+                        occasions={occasions.items}
                         onSelectEvent={setSelectedEvent}
                     />
                 )}

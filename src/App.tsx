@@ -26,8 +26,10 @@ import { UserRole } from '@/types/auth';
 import OccasionsPage from '@/features/occasion/pages/OccasionsPage';
 import OccasionDetailsPage from '@/features/occasion/pages/OccasionDetailsPage';
 import EventsPage from '@/features/calendar/pages/EventsPage';
-import TimelinePage from '@/features/abstract/pages/TimelinePage';
+import TimelinePage from '@/features/calendar/pages/TimelinePage';
 import CalendarPage from '@/features/calendar/pages/CalendarPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   const { actions } = useAuthStore();
@@ -132,6 +134,20 @@ const App = () => {
         {/* Default redirect */}
         <Route path="/" element={<Navigate to="/select-occasion" replace />} />
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        className="toast-container"
+        toastClassName="toast"
+        progressClassName="toast-progress"
+      />
     </BrowserRouter>
   );
 };

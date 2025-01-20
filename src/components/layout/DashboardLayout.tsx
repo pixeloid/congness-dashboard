@@ -18,12 +18,11 @@ import {
 import { UserRole } from '@/types/auth';
 import Logo from '@/components/common/Logo';
 import ThemeToggle from '@/components/common/ThemeToggle';
-import { useOccasionsStore } from '@/features/occasion/store/occasionsStore';
 import { useAuthStore, AuthStatus } from '@/store/authStore';
 import clsx from 'clsx';
-import { useOccasions } from '@/features/occasion/hooks/queries/useOccasion';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import { useOccasionService } from '@/features/occasion/hooks/queries/useOccasion';
 
 interface NavigationItem {
   name: string;
@@ -36,7 +35,6 @@ const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [abstractsOpen, setAbstractsOpen] = useState(false);
   const { occasionCode } = useParams<{ occasionCode: string }>();
-  const { actions: { setSelectedOccasion } } = useOccasionsStore();
   const { user, authStatus, actions: { logout } } = useAuthStore();
   const navigate = useNavigate();
 
@@ -47,10 +45,13 @@ const DashboardLayout: React.FC = () => {
     }
   }, [authStatus, navigate]);
 
-  const { data: occasions, isLoading, error } = useOccasions();
+  if (!occasionCode) {
+    navigate('/select-occasion');
+    return;
+  }
 
-  // Find the current occasion with proper type checking
-  const currentOccasion = occasions && occasionCode ? occasions.find(o => o.code === occasionCode) : null;
+  const { data: currentOccasion, isLoading, error } = useOccasionService.useDetail(occasionCode);
+
 
   const hasRole = (roles?: UserRole[]): boolean => {
     roles;
@@ -68,13 +69,6 @@ const DashboardLayout: React.FC = () => {
     //);
   };
 
-  useEffect(() => {
-    if (occasionCode) {
-      if (currentOccasion) {
-        setSelectedOccasion(currentOccasion);
-      }
-    }
-  }, [occasionCode, occasions, setSelectedOccasion]);
 
   const handleSwitchOccasion = () => {
     navigate('/select-occasion');
@@ -135,7 +129,6 @@ const DashboardLayout: React.FC = () => {
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error instanceof Error ? error.message : 'Error loading occasions'} />;
-  if (!occasions) return null;
 
   return (
     <div className="min-h-screen bg-fixed bg-background-light dark:bg-background-dark">
@@ -232,7 +225,7 @@ const DashboardLayout: React.FC = () => {
               {abstractsOpen && (
                 <div className="ml-4 mt-1 space-y-1">
                   {abstractItems.filter(item => hasRole(item.roles)).map((item) => {
-                    const href = currentOccasion ? `/occasions/${currentOccasion.id}/${item.href}` : '#';
+                    const href = currentOccasion ? `/occasions/${currentOccasion.code}/${item.href}` : '#';
                     return (
                       <Link
                         key={item.name}

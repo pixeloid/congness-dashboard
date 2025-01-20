@@ -1,14 +1,14 @@
 export interface Participant {
-  id: number;
+  '@id'?: string;
   code?: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
   title?: string;
   organization?: string;
+  occasion: string;
   role: 'attendee' | 'speaker' | 'organizer' | 'staff';
   status: 'registered' | 'confirmed' | 'cancelled' | 'attended';
-  registrationDate: string;
   badgeId?: string;
   dietaryRestrictions?: string[];
   notes?: string;

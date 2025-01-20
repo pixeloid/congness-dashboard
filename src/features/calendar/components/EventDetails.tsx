@@ -62,10 +62,10 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, onClose }) => {
                             <CalendarIcon className="h-5 w-5 text-accent" />
                             <div>
                                 <div>
-                                    {format(parseISO(event.startDate), 'PPP', { locale: hu })} -
+                                    {format(parseISO(event.date_start), 'PPP', { locale: hu })} -
                                 </div>
                                 <div>
-                                    {format(parseISO(event.endDate), 'PPP', { locale: hu })}
+                                    {format(parseISO(event.date_end), 'PPP', { locale: hu })}
                                 </div>
                             </div>
                         </div>

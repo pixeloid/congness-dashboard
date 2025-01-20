@@ -1,34 +1,68 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Participant } from '@/features/participant/types/participants';
 
-interface AddParticipantModalProps {
+interface ParticipantModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (participant: Omit<Participant, 'id' | 'registrationDate'>) => void;
+  onUpdate: (participant: Participant) => void;
+  participant?: Participant;
 }
 
-const AddParticipantModal: React.FC<AddParticipantModalProps> = ({ isOpen, onClose, onAdd }) => {
-  const [firstName, setFirstname] = useState('');
+const ParticipantModal: React.FC<ParticipantModalProps> = ({ isOpen, onClose, onAdd, onUpdate, participant }) => {
+  const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [title, setTitle] = useState('');
   const [organization, setOrganization] = useState('');
   const [role, setRole] = useState<Participant['role']>('attendee');
 
+
+  useEffect(() => {
+    if (participant) {
+      setFirstName(participant.first_name);
+      setLastName(participant.last_name);
+      setEmail(participant.email);
+      setTitle(participant.title!);
+      setOrganization(participant.organization!);
+      setRole(participant.role);
+    } else {
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setTitle('');
+      setOrganization('');
+      setRole('attendee');
+    }
+  }, [participant]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAdd({
-      firstName,
-      lastName,
-      email,
-      title,
-      organization,
-      role,
-      status: 'registered'
-    });
+    if (participant) {
+      onUpdate({
+        ...participant,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        title,
+        organization,
+        role,
+      });
+    } else {
+      onAdd({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        title,
+        organization,
+        role,
+        status: 'registered',
+        occasion: '',
+      });
+    }
     onClose();
   };
 
@@ -68,7 +102,7 @@ const AddParticipantModal: React.FC<AddParticipantModalProps> = ({ isOpen, onClo
               <input
                 type="text"
                 value={firstName}
-                onChange={(e) => setFirstname(e.target.value)}
+                onChange={(e) => setFirstName(e.target.value)}
                 className="w-full px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white"
                 required
               />
@@ -150,4 +184,4 @@ const AddParticipantModal: React.FC<AddParticipantModalProps> = ({ isOpen, onClo
   );
 };
 
-export default AddParticipantModal;
+export default ParticipantModal;

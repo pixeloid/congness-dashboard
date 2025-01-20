@@ -19,7 +19,8 @@ export interface Contact {
 
 // Core Occasion type that connects all related entities
 export interface Occasion {
-  id: number;
+  numParticipants?: number;
+  '@id'?: string;
   code?: string;
   name: string;
   subtitle?: string;
@@ -27,8 +28,8 @@ export interface Occasion {
   url?: string;
   logo?: string;
   type: 'conference' | 'workshop' | 'training' | 'seminar';
-  startDate: string;
-  endDate: string;
+  date_start: string;
+  date_end: string;
   venue?: Venue;
   contact?: Contact;
 
@@ -58,11 +59,6 @@ export interface Occasion {
     id: number;
     name: string;
     type: string;
-  }[];
-  participants?: {
-    id: number;
-    name: string;
-    role: string;
   }[];
 }
 

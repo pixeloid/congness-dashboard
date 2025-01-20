@@ -17,8 +17,8 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate, occasions, onSelectEve
 
     const getEventsForHour = (day: Date, hour: number) => {
         return occasions.filter(event => {
-            const eventStart = parseISO(event.startDate);
-            const eventEnd = parseISO(event.endDate);
+            const eventStart = parseISO(event.date_start);
+            const eventEnd = parseISO(event.date_end);
             const hourStart = new Date(day.setHours(hour, 0, 0, 0));
             const hourEnd = new Date(day.setHours(hour, 59, 59, 999));
             return isWithinInterval(hourStart, { start: eventStart, end: eventEnd }) ||
@@ -65,7 +65,7 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate, occasions, onSelectEve
                                 >
                                     {events.map((event) => (
                                         <button
-                                            key={event.id}
+                                            key={event['@id']}
                                             onClick={() => onSelectEvent(event)}
                                             className={clsx(
                                                 'absolute left-0 right-0 m-1 px-2 py-1 text-xs rounded truncate transition-colors',

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Checkpoint } from '@/features/checkpoints/types/checkpoints';
-import { useCheckpointStore } from '@/features/checkpoints/store/checkpointStore';
 import { format } from 'date-fns';
 import {
   PencilIcon,
@@ -14,8 +13,8 @@ import {
 
 interface CheckpointListProps {
   checkpoints: Checkpoint[];
-  onUpdate: (id: number, updates: Partial<Checkpoint>) => void;
-  onDelete: (id: number) => void;
+  onUpdate: (checkpoint: Checkpoint) => void;
+  onDelete: (checkpoint: Checkpoint) => void;
 }
 
 const CheckpointList: React.FC<CheckpointListProps> = ({
@@ -23,7 +22,6 @@ const CheckpointList: React.FC<CheckpointListProps> = ({
   onUpdate,
   onDelete
 }) => {
-  const getCheckpointStats = useCheckpointStore(state => state.actions.getCheckpointStats);
 
   const getStatusColor = (status: Checkpoint['status']) => {
     switch (status) {
@@ -54,10 +52,9 @@ const CheckpointList: React.FC<CheckpointListProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {checkpoints.map((checkpoint) => {
-        const stats = getCheckpointStats(checkpoint.id);
 
         return (
-          <div key={checkpoint.id} className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10">
+          <div key={checkpoint['@id']} className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10">
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -76,13 +73,13 @@ const CheckpointList: React.FC<CheckpointListProps> = ({
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => onUpdate(checkpoint.id, {})}
+                    onClick={() => onUpdate(checkpoint)}
                     className="p-2 rounded-lg bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
                   >
                     <PencilIcon className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => onDelete(checkpoint.id)}
+                    onClick={() => onDelete(checkpoint)}
                     className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
                   >
                     <TrashIcon className="h-5 w-5" />
@@ -127,13 +124,7 @@ const CheckpointList: React.FC<CheckpointListProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <p className="text-2xl font-display font-bold text-white">
-                      {stats.uniqueVisitors}
-                    </p>
-                    <p className="text-sm text-white/70">Unique Visitors</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-display font-bold text-white">
-                      {stats.totalVisits}
+                      {checkpoint.checkinsCount}
                     </p>
                     <p className="text-sm text-white/70">Total Visits</p>
                   </div>

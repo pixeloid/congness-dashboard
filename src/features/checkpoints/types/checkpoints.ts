@@ -4,23 +4,24 @@ export type CheckpointStatus = 'active' | 'inactive' | 'scheduled';
 export type CheckpointRestriction = 'none' | 'paid' | 'vip' | 'staff';
 
 export interface Checkpoint {
-  id: number;
+  '@id'?: string;
   name: string;
   description?: string;
   type: CheckpointType;
   status: CheckpointStatus;
   restriction: CheckpointRestriction;
-  occasionId: number;
+  occasion: string;
   location?: string;
   capacity?: number;
   startTime?: string;
   endTime?: string;
   requiresPassport?: boolean;
   price?: number;
+  checkinsCount?: number;
 }
 
 export interface CheckpointVisit {
-  id: number;
+  '@id'?: string;
   checkpointId: number;
   participantId: number;
   timestamp: string;
@@ -30,7 +31,7 @@ export interface CheckpointVisit {
 }
 
 export interface ParticipantPassport {
-  id: number;
+  '@id': string;
   participantId: number;
   occasionId: number;
   checkpoints: {

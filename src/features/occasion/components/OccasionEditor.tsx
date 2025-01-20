@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Occasion } from '@/features/occasion/types/occasions';
 import { format } from 'date-fns';
 import { MapPinIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import { formatDateRange } from '@/helpers/formatDateRange';
 
 interface OccasionEditorProps {
     occasion: Occasion;
@@ -15,21 +16,21 @@ const OccasionEditor: React.FC<OccasionEditorProps> = ({ occasion, onSave }) => 
         subtitle: occasion.subtitle || '',
         description: occasion.description || '',
         url: occasion.url || '',
-        startDate: format(new Date(occasion.startDate), 'yyyy-MM-dd'),
-        endDate: format(new Date(occasion.endDate), 'yyyy-MM-dd'),
+        startDate: format(new Date(occasion.date_start), 'yyyy-MM-dd'),
+        endDate: format(new Date(occasion.date_end), 'yyyy-MM-dd'),
         venue: {
-            name: occasion.venue!.name,
-            address: occasion.venue!.address,
-            description: occasion.venue!.description,
-            url: occasion.venue!.url,
+            name: occasion.venue?.name || '',
+            address: occasion.venue?.address || '',
+            description: occasion.venue?.description || '',
+            url: occasion.venue?.url || '',
             coordinates: {
-                lat: occasion.venue!.coordinates.lat,
-                lng: occasion.venue!.coordinates.lng
+                lat: occasion.venue?.coordinates?.lat || 0,
+                lng: occasion.venue?.coordinates?.lng || 0
             }
         },
         contact: {
-            name: occasion.contact!.name,
-            email: occasion.contact!.email
+            name: occasion.contact?.name,
+            email: occasion.contact?.email
         }
     });
 
@@ -39,7 +40,11 @@ const OccasionEditor: React.FC<OccasionEditorProps> = ({ occasion, onSave }) => 
             ...formData,
             venue: {
                 ...formData.venue,
-                photo: occasion.venue!.photo // Preserve existing photo
+                photo: occasion.venue?.photo ?? ''// Preserve existing photo
+            },
+            contact: {
+                name: formData.contact.name ?? '',
+                email: formData.contact.email ?? ''
             }
         });
         setIsEditing(false);
@@ -90,8 +95,7 @@ const OccasionEditor: React.FC<OccasionEditorProps> = ({ occasion, onSave }) => 
                             <div>
                                 <label className="block text-sm font-medium text-white/70">Dates</label>
                                 <p className="text-white mt-1">
-                                    {format(new Date(occasion.startDate), 'PPP')} -
-                                    {format(new Date(occasion.endDate), 'PPP')}
+                                    {formatDateRange(occasion.date_start, occasion.date_end)}
                                 </p>
                             </div>
                         </div>
@@ -115,7 +119,7 @@ const OccasionEditor: React.FC<OccasionEditorProps> = ({ occasion, onSave }) => 
                                     <label className="block text-sm font-medium text-white/70">Description</label>
                                     <p className="text-white mt-1">{occasion.venue.description}</p>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                {occasion.venue.url && <div className="flex items-center gap-2">
                                     <GlobeAltIcon className="h-5 w-5 text-accent" />
                                     <a
                                         href={occasion.venue.url}
@@ -123,9 +127,15 @@ const OccasionEditor: React.FC<OccasionEditorProps> = ({ occasion, onSave }) => 
                                         rel="noopener noreferrer"
                                         className="text-accent hover:text-accent-light"
                                     >
-                                        {new URL(occasion.venue.url).hostname}
+                                        {occasion.venue.url && (() => {
+                                            try {
+                                                return new URL(occasion.venue.url).hostname;
+                                            } catch {
+                                                return occasion.venue.url;
+                                            }
+                                        })()}
                                     </a>
-                                </div>
+                                </div>}
                             </div>)}
                     </div>
 

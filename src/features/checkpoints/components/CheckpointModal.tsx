@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Checkpoint, CheckpointType, CheckpointStatus, CheckpointRestriction } from '@/features/checkpoints/types/checkpoints';
 
-interface AddCheckpointModalProps {
+interface CheckpointModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (checkpoint: Omit<Checkpoint, 'id'>) => void;
+  onAdd: (checkpoint: Omit<Checkpoint, 'id' | 'occasion'>) => void;
+  onUpdate: (checkpoint: Checkpoint) => void;
+  checkpoint?: Checkpoint;
 }
 
-const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({ isOpen, onClose, onAdd }) => {
+const CheckpointModal: React.FC<CheckpointModalProps> = ({ isOpen, onClose, onAdd, onUpdate, checkpoint }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState<CheckpointType>('general');
@@ -21,11 +23,39 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({ isOpen, onClose
   const [requiresPassport, setRequiresPassport] = useState(false);
   const [price, setPrice] = useState('');
 
+  useEffect(() => {
+    if (checkpoint) {
+      setName(checkpoint.name);
+      setDescription(checkpoint.description ? checkpoint.description : '');
+      setType(checkpoint.type);
+      setStatus(checkpoint.status);
+      setRestriction(checkpoint.restriction);
+      setLocation(checkpoint.location ? checkpoint.location : '');
+      setCapacity(checkpoint.capacity ? checkpoint.capacity.toString() : '');
+      setStartTime(checkpoint.startTime || '');
+      setEndTime(checkpoint.endTime || '');
+      setRequiresPassport(checkpoint.requiresPassport ? checkpoint.requiresPassport : false);
+      setPrice(checkpoint.price ? checkpoint.price.toString() : '');
+    } else {
+      setName('');
+      setDescription('');
+      setType('general');
+      setStatus('inactive');
+      setRestriction('none');
+      setLocation('');
+      setCapacity('');
+      setStartTime('');
+      setEndTime('');
+      setRequiresPassport(false);
+      setPrice('');
+    }
+  }, [checkpoint]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAdd({
+    const checkpointData: Omit<Checkpoint, 'id' | 'occasion'> = {
       name,
       description,
       type,
@@ -37,23 +67,16 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({ isOpen, onClose
       endTime: endTime || undefined,
       requiresPassport,
       price: price ? parseInt(price) : undefined,
-      occasionId: 0 // This will be set by the parent component
-    });
+    };
 
-    // Reset form
-    setName('');
-    setDescription('');
-    setType('general');
-    setStatus('inactive');
-    setRestriction('none');
-    setLocation('');
-    setCapacity('');
-    setStartTime('');
-    setEndTime('');
-    setRequiresPassport(false);
-    setPrice('');
+    if (checkpoint) {
+      onUpdate({ ...checkpoint, ...checkpointData });
+    } else {
+      onAdd(checkpointData);
+    }
+
+    onClose();
   };
-
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4">
@@ -253,7 +276,7 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({ isOpen, onClose
                 type="submit"
                 className="px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
               >
-                Create Checkpoint
+                {checkpoint ? 'Update' : 'Add'}
               </button>
             </div>
           </form>
@@ -263,4 +286,4 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({ isOpen, onClose
   );
 };
 
-export default AddCheckpointModal;
+export default CheckpointModal;
