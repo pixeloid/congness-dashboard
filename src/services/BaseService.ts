@@ -24,10 +24,10 @@ export class BaseService<Entity> {
   /**
    * Generic GET method for lists.
    */
-  async getList(filters?: Record<string, unknown>, parentUrl?: string): Promise<{ items: Entity[], totalItems: number, view: any }> {
+  async getList(filters?: Record<string, unknown>, parentUrl?: string, page: number = 1): Promise<{ items: Entity[], totalItems: number, view: any }> {
     const queryString = filters
-      ? `?${new URLSearchParams(filters as Record<string, string>).toString()}`
-      : '';
+      ? `?${new URLSearchParams({ ...filters, page: page.toString() } as Record<string, string>).toString()}`
+      : `?page=${page}`;
     const url = this.buildUrl('', parentUrl) + queryString;
     const { data } = await api.get<{ 'hydra:member': Entity[], 'hydra:totalItems': number, 'hydra:view': any }>(url);
     return {
