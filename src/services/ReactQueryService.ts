@@ -1,7 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-export type Filters = Record<string, unknown>;
+export type Filters = {
+    page?: number;
+    [key: string]: unknown;
+};
 export type HydraView = {
     '@id'?: string;
     '@type'?: string;
@@ -48,7 +51,7 @@ export class ReactQueryService<
     getQueryKeys(parentUrl?: string) {
         return {
             all: [this.baseKey, parentUrl].filter(Boolean),
-            lists: (filters: Filters = {} as Filters) =>
+            lists: (filters: Filters = { page: 1 } as unknown as Filters) =>
                 [...this.getQueryKeys(parentUrl).all, 'list', { filters }] as const,
             details: () => [...this.getQueryKeys(parentUrl).all, 'detail'] as const,
             detail: (id: string | number) =>
