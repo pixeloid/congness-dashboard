@@ -56,7 +56,7 @@ const OccasionList: React.FC = () => {
 
     return (
         <EntityList
-            useService={(filters, parentUrl, page) => useOccasionService.useList(filters, parentUrl, page)}
+            useService={(filters, parentUrl) => useOccasionService.useList(filters, parentUrl)}
             renderItem={renderOccasion}
             filters={filters}
             setFilters={setFilters}

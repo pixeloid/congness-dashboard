@@ -32,7 +32,7 @@ const EventsPage = () => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [page, setPage] = useState(1);
 
-    const { data: occasions, error, isLoading, refetch } = useOccasionService.useList(filters, undefined, page);
+    const { data: occasions, error, isLoading, refetch } = useOccasionService.useList(filters, undefined);
 
     useEffect(() => {
         refetch();

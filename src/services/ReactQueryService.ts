@@ -62,7 +62,7 @@ export class ReactQueryService<
     useList(filters?: Filters, parentUrl?: string) {
         return useQuery<PaginatedResponse<Entity>>({
             queryKey: this.getQueryKeys(parentUrl).lists(filters as Filters),
-            queryFn: (a) => {
+            queryFn: () => {
                 return this.service.getList(filters as Filters, parentUrl);
             },
             select: (data) => ({
