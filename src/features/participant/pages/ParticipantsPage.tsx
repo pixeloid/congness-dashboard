@@ -1,46 +1,21 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import ParticipantStatusBadge from '@/features/participant/components/ParticipantStatusBadge';
-import ParticipantRoleBadge from '@/features/participant/components/ParticipantRoleBadge';
-import ParticipantFilters from '@/features/participant/components/ParticipantFilters';
 import ParticipantModal from '@/features/participant/components/ParticipantModal';
 import ImportParticipantsModal from '@/features/participant/components/ImportParticipantsModal';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import ErrorMessage from '@/components/common/ErrorMessage';
 import { UserPlusIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
-import { useParticipantsStore } from '@/features/participant/store/participantsStore';
 import { useParticipant } from '@/features/participant/hooks/queries/useParticipant';
-import { Filters } from '@/services/ReactQueryService';
 import { Participant } from '@/features/participant/types/participants';
+import ParticipantList from '@/features/participant/components/ParticipantList';
 
 const ParticipantsPage = () => {
   const { occasionCode } = useParams<{ occasionCode: string }>();
   const [isParticipantModalOpen, setIsParticipantModalOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<Participant | undefined>(undefined);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const { filters, actions: { setFilters } } = useParticipantsStore();
   const participantsService = useParticipant();
-  const { data: participants, isLoading, isError: isLoadError, error: loadError } = participantsService.useList(filters as Filters, `/api/occasions/${occasionCode}`);
   const { mutate: createParticipant } = participantsService.useCreate(`/api/occasions/${occasionCode}`);
   const { mutate: updateParticipant } = participantsService.useUpdate(`/api/occasions/${occasionCode}`);
   const { mutate: deleteParticipant } = participantsService.useDelete(`/api/occasions/${occasionCode}`);
-
-  if (isLoading) return <LoadingSpinner />;
-  if (isLoadError) return <ErrorMessage message={loadError.message} />;
-
-  const filteredParticipants = participants && participants.items.filter(participant => {
-    if (filters.role && participant.role !== filters.role) return false;
-    if (filters.status && participant.status !== filters.status) return false;
-    if (filters.search) {
-      const search = filters.search.toLowerCase();
-      return (
-        participant.first_name.toLowerCase().includes(search) ||
-        participant.last_name.toLowerCase().includes(search) ||
-        participant.email.toLowerCase().includes(search)
-      );
-    }
-    return true;
-  });
 
   const handleAddParticipant = (participant: Omit<Participant, 'id' | 'registrationDate'>) => {
     createParticipant({
@@ -61,85 +36,33 @@ const ParticipantsPage = () => {
     setIsParticipantModalOpen(true);
   };
 
-
   return (
     <div className="p-6 space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-4xl font-display font-bold text-white mb-2">Résztvevők</h1>
-          <p className="text-lg text-white/70">Résztvevők kezelése és áttekintése</p>
-        </div>
-        <div className="flex gap-4">
-          <button
-            onClick={() => setIsImportModalOpen(true)}
-            className="inline-flex items-center px-4 py-2 bg-navy/50 text-white rounded-lg border border-white/10 hover:border-accent/30 transition-colors"
-          >
-            <ArrowUpTrayIcon className="h-5 w-5 mr-2" />
-            <span>Import CSV</span>
-          </button>
-          <button
-            onClick={() => setIsParticipantModalOpen(true)}
-            className="inline-flex items-center px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
-          >
-            <UserPlusIcon className="h-5 w-5 mr-2" />
-            <span>Új Résztvevő</span>
-          </button>
-        </div>
+      <div className="flex justify-between items-center"></div>
+      <div>
+        <h1 className="text-4xl font-display font-bold text-white mb-2">Résztvevők</h1>
+        <p className="text-lg text-white/70">Résztvevők kezelése és áttekintése</p>
       </div>
-
-      <ParticipantFilters filters={filters} onFilterChange={setFilters} />
-
-
-      <div className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/10">
-                <th className="px-6 py-4 text-left text-sm font-medium text-white/70">Név</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-white/70">Email</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-white/70">Szerep</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-white/70">Státusz</th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-white/70">Műveletek</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/10">
-              {filteredParticipants && filteredParticipants.map((participant) => (
-                <tr key={participant['@id']} className="hover:bg-white/5">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-white">{`${participant.last_name} ${participant.first_name}`}</div>
-                      {participant.organization && (
-                        <div className="text-sm text-white/70">{participant.organization}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-white/70">{participant.email}</td>
-                  <td className="px-6 py-4">
-                    <ParticipantRoleBadge role={participant.role} />
-                  </td>
-                  <td className="px-6 py-4">
-                    <ParticipantStatusBadge status={participant.status} />
-                  </td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    <button
-                      onClick={() => handleEditClick(participant)}
-                      className="px-3 py-1 text-sm bg-accent/10 text-accent rounded hover:bg-accent/20 transition-colors">
-                      Szerkesztés
-                    </button>
-                    <button
-                      onClick={() => deleteParticipant(participant['@id']!)}
-                      className="px-3 py-1 text-sm bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors"
-                    >
-                      Törlés
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <div className="flex gap-4">
+        <button
+          onClick={() => setIsImportModalOpen(true)}
+          className="inline-flex items-center px-4 py-2 bg-navy/50 text-white rounded-lg border border-white/10 hover:border-accent/30 transition-colors"
+        >
+          <ArrowUpTrayIcon className="h-5 w-5 mr-2" />
+          <span>Import CSV</span>
+        </button>
+        <button
+          onClick={() => setIsParticipantModalOpen(true)}
+          className="inline-flex items-center px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
+        >
+          <UserPlusIcon className="h-5 w-5 mr-2" />
+          <span>Új Résztvevő</span>
+        </button>
       </div>
-
+      <ParticipantList
+        onEditClick={handleEditClick}
+        onDeleteClick={(id) => deleteParticipant(id)}
+      />
       <ParticipantModal
         isOpen={isParticipantModalOpen}
         onClose={() => {
@@ -150,7 +73,6 @@ const ParticipantsPage = () => {
         onUpdate={handleUpdateParticipant}
         participant={selectedParticipant}
       />
-
       <ImportParticipantsModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
@@ -163,6 +85,7 @@ const ParticipantsPage = () => {
           });
         }}
       />
+
     </div>
   );
 };
