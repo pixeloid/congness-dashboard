@@ -16,7 +16,7 @@ import { useOccasionService } from '@/features/occasion/hooks/queries/useOccasio
 const TimelinePage = () => {
     const [selectedEvent, setSelectedEvent] = useState<Occasion | null>(null);
     const [expandedMonth, setExpandedMonth] = useState<string | null>(null);
-    const { data: occasions } = useOccasionService.useList();
+    const { data: occasions } = useOccasionService.useList({});
 
     // Group events by month
     const groupedEvents = occasions?.items.reduce((groups, event) => {
