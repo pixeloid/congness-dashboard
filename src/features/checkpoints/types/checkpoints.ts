@@ -1,3 +1,4 @@
+import { Filters } from "@/services/ReactQueryService";
 
 export type CheckpointType = 'registration' | 'dining' | 'program' | 'general';
 export type CheckpointStatus = 'active' | 'inactive' | 'scheduled';
@@ -52,7 +53,7 @@ export interface CheckpointStats {
   validationRate: number;
 }
 
-export interface CheckpointFilters {
+export interface CheckpointFilters extends Filters {
   type?: CheckpointType;
   status?: CheckpointStatus;
   restriction?: CheckpointRestriction;

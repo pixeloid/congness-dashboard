@@ -59,7 +59,7 @@ const ParticipantList: React.FC<ParticipantListProps> = ({ onEditClick, onDelete
                         <thead>
 
                             <EntityList
-                                useService={(filters, parentUrl) => useParticipant().useList(filters as Filters, `/api/occasions/${occasionCode}`)}
+                                useService={(filters) => useParticipant().useList(filters as Filters, `/api/occasions/${occasionCode}`)}
                                 renderItem={renderParticipant}
                                 filters={filters}
                             />

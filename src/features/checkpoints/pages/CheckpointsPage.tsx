@@ -6,7 +6,6 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { useCheckpoint } from '@/features/checkpoints/hooks/queries/useCheckpoint';
-import { useCheckpointStore } from '@/features/checkpoints/store/checkpointStore';
 import CheckpointModal from '@/features/checkpoints/components/CheckpointModal';
 import { Checkpoint } from '@/features/checkpoints/types/checkpoints';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -18,15 +17,7 @@ const CheckpointsPage = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [checkpointToDelete, setCheckpointToDelete] = useState<Checkpoint | undefined>(undefined);
 
-  const {
-    filters,
-    actions: {
-      setFilters,
-    }
-  } = useCheckpointStore();
-
   const checkpointService = useCheckpoint();
-  const { data: checkpoints, isLoading, error } = checkpointService.useList(undefined, `/api/occasions/${occasionCode}`);
   const { mutate: updateCheckpoint } = checkpointService.useUpdate(`/api/occasions/${occasionCode}`);
   const { mutate: addCheckpoint } = checkpointService.useCreate(`/api/occasions/${occasionCode}`);
   const { mutate: deleteCheckpoint } = checkpointService.useDelete(`/api/occasions/${occasionCode}`);
@@ -75,10 +66,8 @@ const CheckpointsPage = () => {
     setIsConfirmModalOpen(false);
   };
 
-  if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error.message} />;
 
-  return checkpoints && (
+  return (
     <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
         <div>
@@ -94,10 +83,8 @@ const CheckpointsPage = () => {
         </button>
       </div>
 
-      <CheckpointFilters filters={filters} onFilterChange={setFilters} />
 
       <CheckpointList
-        checkpoints={checkpoints.items}
         onDelete={handleDeleteClick}
         onUpdate={handleEditClick}
       />

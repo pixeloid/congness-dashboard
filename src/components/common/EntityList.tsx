@@ -45,8 +45,12 @@ const EntityList = <Entity extends { '@id'?: string }>({
         Object.entries({ ...filters, page }).forEach(([key, value]) => {
             if (value) newQuery.set(key, value as unknown as string);
         });
-        navigate({ search: newQuery.toString() }, { replace: true });
-    }, [filters, page, navigate]);
+
+        const currentQuery = new URLSearchParams(location.search);
+        if (newQuery.toString() !== currentQuery.toString()) {
+            navigate({ search: newQuery.toString() }, { replace: true });
+        }
+    }, [filters, page, navigate, location.search]);
 
     return (
         <Fragment>
