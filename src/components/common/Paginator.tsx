@@ -2,11 +2,13 @@ import { HydraView } from '@/services/ReactQueryService';
 import React from 'react';
 
 interface PaginatorProps {
-    view: HydraView;
+    view?: HydraView;
     setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const Paginator: React.FC<PaginatorProps> = ({ view, setPage }) => {
+    if (!view) return null;
+
     const maxPagesToShow = 6;
     const hasNextPage = view['hydra:next'] !== undefined;
     const totalPages = view['hydra:last'] ? Number(new URLSearchParams(view['hydra:last'].split('?')[1]).get('page')) : 1;

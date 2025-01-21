@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Paginator from '@/components/common/Paginator';
 
@@ -17,31 +18,51 @@ const EntityList = <Entity extends { '@id'?: string }>({
     renderItem,
     filters,
 }: EntityListProps<Entity>) => {
-    const [page, setPage] = useState(1);
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    const { data: entities, isLoading, refetch } = useService({ ...filters, page: page || 1 }, undefined, page);
+    const query = new URLSearchParams(location.search);
+    const urlFilters = useMemo(() => Object.fromEntries(query.entries()), [location.search]);
+    const initialPage = useMemo(() => parseInt(query.get('page') || '1', 10), [query]);
+
+    const [page, setPage] = useState(initialPage);
+    const [previousEntities, setPreviousEntities] = useState<Entity[]>([]);
+
+    const { data: entities, isLoading, refetch } = useService({ ...filters, ...urlFilters, page: page || 1 }, undefined, page);
 
     useEffect(() => {
         refetch();
-    }, [filters, page]);
+    }, [filters, urlFilters, page]);
 
     useEffect(() => {
-        setPage(1); // Reset to first page when filters change
-    }, [filters]);
+        if (entities && entities.items) {
+            setPreviousEntities(entities.items);
+        }
+    }, [entities]);
+
+    useEffect(() => {
+        const newQuery = new URLSearchParams();
+        Object.entries({ ...filters, page }).forEach(([key, value]) => {
+            if (value) newQuery.set(key, value as unknown as string);
+        });
+        navigate({ search: newQuery.toString() }, { replace: true });
+    }, [filters, page, navigate]);
 
     return (
-        <div>
+        <Fragment>
             {entities && entities.view && (<Paginator view={entities.view} setPage={setPage} />)}
-            <div className="grid grid-cols-1 gap-4">
-                {isLoading && <LoadingSpinner />}
-                {entities && entities.items.map((entity) => (
-                    <div key={entity['@id']} className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6">
-                        {renderItem(entity)}
-                    </div>
-                ))}
-            </div>
+            {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+                    <LoadingSpinner />
+                </div>
+            )}
+            {(entities ? entities.items : previousEntities).map((entity) => (
+                <Fragment key={entity['@id']}>
+                    {renderItem(entity)}
+                </Fragment>
+            ))}
             {entities && entities.view && (<Paginator view={entities.view} setPage={setPage} />)}
-        </div>
+        </Fragment>
     );
 };
 

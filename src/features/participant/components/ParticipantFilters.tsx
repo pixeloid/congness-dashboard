@@ -1,10 +1,11 @@
 import React from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { ParticipantFilters as Filters } from '@/features/participant/types/participants';
+import { Filters } from '@/services/ReactQueryService';
+
 
 interface ParticipantFiltersProps {
   filters: Filters;
-  onFilterChange: (filters: Filters) => void;
+  onFilterChange: React.Dispatch<React.SetStateAction<Filters>>;
 }
 
 const roleOptions = [
@@ -32,7 +33,7 @@ const ParticipantFilters: React.FC<ParticipantFiltersProps> = ({ filters, onFilt
           <input
             type="text"
             placeholder="Keresés név vagy email alapján..."
-            value={filters.search || ''}
+            value={typeof filters.search === 'string' ? filters.search : ''}
             onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
             className="w-full pl-10 pr-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:border-accent/30 focus:outline-none focus:ring-1 focus:ring-accent/30"
           />
@@ -40,7 +41,7 @@ const ParticipantFilters: React.FC<ParticipantFiltersProps> = ({ filters, onFilt
       </div>
 
       <select
-        value={filters.role || ''}
+        value={typeof filters.role === 'string' ? filters.role : ''}
         onChange={(e) => onFilterChange({ ...filters, role: e.target.value })}
         className="px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white focus:border-accent/30 focus:outline-none focus:ring-1 focus:ring-accent/30"
       >
@@ -50,7 +51,7 @@ const ParticipantFilters: React.FC<ParticipantFiltersProps> = ({ filters, onFilt
       </select>
 
       <select
-        value={filters.status || ''}
+        value={typeof filters.status === 'string' ? filters.status : ''}
         onChange={(e) => onFilterChange({ ...filters, status: e.target.value })}
         className="px-4 py-2 bg-navy/30 border border-white/10 rounded-lg text-white focus:border-accent/30 focus:outline-none focus:ring-1 focus:ring-accent/30"
       >

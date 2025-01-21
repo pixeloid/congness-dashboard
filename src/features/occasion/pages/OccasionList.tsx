@@ -20,40 +20,43 @@ const OccasionList: React.FC = () => {
 
     const renderOccasion = (occasion: Occasion) => (
 
+        <div
+            className="bg-navy/30 backdrop-blur-md rounded-xl border border-white/10 p-6"
+        >
 
-        <div className="flex justify-between items-start">
-
-            <div className="space-y-2">
-                <h2 className="text-xl font-display font-semibold text-white">
-                    {occasion.name}
-                </h2>
-                {occasion.subtitle && (
-                    <p className="text-white/70">{occasion.subtitle}</p>
-                )}
-                <div className="flex items-center gap-4 text-sm text-white/50">
-                    <span>
-                        {formatDateRange(occasion.date_start, occasion.date_end)}
-                    </span>
-                    {occasion.venue && <div className="flex items-center gap-2">
-                        <MapPinIcon className="h-4 w-4" />
-                        <span>{occasion.venue.name}</span>
-                    </div>}
+            <div className="flex justify-between items-start">
+                <div className="space-y-2">
+                    <h2 className="text-xl font-display font-semibold text-white">
+                        {occasion.name}
+                    </h2>
+                    {occasion.subtitle && (
+                        <p className="text-white/70">{occasion.subtitle}</p>
+                    )}
+                    <div className="flex items-center gap-4 text-sm text-white/50">
+                        <span>
+                            {formatDateRange(occasion.date_start, occasion.date_end)}
+                        </span>
+                        {occasion.venue && <div className="flex items-center gap-2">
+                            <MapPinIcon className="h-4 w-4" />
+                            <span>{occasion.venue.name}</span>
+                        </div>}
+                    </div>
                 </div>
-            </div>
-            <div className="flex gap-4">
-                <button
-                    onClick={() => navigate(`/occasions/${occasion.code}/details`)}
-                    className="inline-flex items-center px-4 py-2 bg-navy/50 text-white rounded-lg border border-white/10 hover:border-accent/30 transition-colors"
-                >
-                    <PencilIcon className="h-5 w-5 mr-2" />
-                    Edit
-                </button>
-                <button
-                    onClick={() => navigate(`/occasions/${occasion.code}/dashboard`)}
-                    className="px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
-                >
-                    Open Dashboard
-                </button>
+                <div className="flex gap-4">
+                    <button
+                        onClick={() => navigate(`/occasions/${occasion.code}/details`)}
+                        className="inline-flex items-center px-4 py-2 bg-navy/50 text-white rounded-lg border border-white/10 hover:border-accent/30 transition-colors"
+                    >
+                        <PencilIcon className="h-5 w-5 mr-2" />
+                        Edit
+                    </button>
+                    <button
+                        onClick={() => navigate(`/occasions/${occasion.code}/dashboard`)}
+                        className="px-4 py-2 bg-accent text-navy-dark rounded-lg hover:bg-accent-light transition-colors"
+                    >
+                        Open Dashboard
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -70,11 +73,14 @@ const OccasionList: React.FC = () => {
                 />
                 {/* Add more filter inputs as needed */}
             </div>
-            <EntityList
-                useService={(filters, parentUrl) => useOccasionService.useList(filters, parentUrl)}
-                renderItem={renderOccasion}
-                filters={filters}
-            />
+            <div className="grid grid-cols-1 gap-4 relative">
+
+                <EntityList
+                    useService={(filters, parentUrl) => useOccasionService.useList(filters, parentUrl)}
+                    renderItem={renderOccasion}
+                    filters={filters}
+                />
+            </div>
         </Fragment>
     );
 };
